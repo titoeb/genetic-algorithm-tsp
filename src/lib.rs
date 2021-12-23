@@ -59,7 +59,7 @@ impl Solution {
     pub fn mutate(self, prob: f32) -> Self {
         Solution {
             indexes: if rand::thread_rng().gen_range(0.0..1.0) > prob {
-                self.indexes.clone()
+                self.indexes
             } else {
                 let put_before_idx: usize =
                     rand::thread_rng().gen_range(0..(self.indexes.len() - 1));
