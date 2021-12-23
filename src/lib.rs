@@ -10,6 +10,9 @@ impl DistanceMat {
     pub fn new(distances: Vec<Vec<f64>>) -> Self {
         DistanceMat { distances }
     }
+    // TODO: This has to return an `Result`, if there are fewer entries than
+    // 2 in `solution` or there is any index in Solution that does not exist in
+    // the dist matrix, return a custom error (too few entries / unkown elements)
     pub fn get_distance(&self, solution: &mut Solution) -> f64 {
         solution
             .indexes
