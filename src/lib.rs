@@ -39,8 +39,8 @@ pub struct Solution {
     indexes: Vec<usize>,
 }
 
-fn change_order(data: &Vec<usize>, put_before_idx: usize, move_idx: usize) -> Vec<usize> {
-    let mut new_data = data.clone();
+fn change_order(data: &[usize], put_before_idx: usize, move_idx: usize) -> Vec<usize> {
+    let mut new_data = data.to_owned();
     let move_item = data[move_idx];
     new_data.remove(move_idx);
     new_data.insert(max(put_before_idx, 1) - 1, move_item);
