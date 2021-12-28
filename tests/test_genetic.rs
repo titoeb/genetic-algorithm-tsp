@@ -1,5 +1,5 @@
-use genetic_algo::DistanceMat;
-use genetic_algo::Solution;
+use genetic_algo::distance_mat::DistanceMat;
+use genetic_algo::solution::Solution;
 use std::fs;
 
 #[test]
