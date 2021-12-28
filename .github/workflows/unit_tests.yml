@@ -1,0 +1,36 @@
+on: pull_request
+name: Running unit tests.
+permissions:
+  pull-requests: write
+  checks: write
+  contents: read
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository.
+        uses: actions/checkout@v2
+      - name: Install toolchain.
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+      - name: Execute tests
+        run: cargo test | tee test_results.txt && tail -n 7 test_results.txt > test_results_pr_comment.txt
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
+          RUSTDOCFLAGS: "-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
+      - name: Read test_results
+        if: always()
+        id: test_results
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./test_results_pr_comment.txt
+      - name: Read Test results
+        uses: actions-ecosystem/action-create-comment@v1
+        if: always()
+        with:
+          github_token: ${{ secrets.github_token }}
+          body: ${{steps.test_results.outputs.content}}

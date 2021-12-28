@@ -1,0 +1,28 @@
+on: pull_request
+name: Clippy check
+permissions:
+  pull-requests: write
+  checks: write
+  contents: read
+jobs:
+  clippy_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@v1
+      - name: Install clippy.
+        run: rustup component add clippy
+      - name: Clippy Check.
+        uses: actions-rs/clippy-check@v1
+        id: clippy
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+      # Currently, I can't access the summary that is created by this action.
+      # - name: Add a comment.
+      #   uses: actions-ecosystem/action-create-comment@v1
+      #   with:
+      #     if: always()
+      #     github_token: ${{ secrets.github_token }}
+      #     body: |
+      #       Your Clippy results: ${{steps.clippy.outputs.summary}}
