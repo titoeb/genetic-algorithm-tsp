@@ -66,38 +66,5 @@ mod tests {
                 vec![1, 2, 3, 4]
             )
         }
-        #[test]
-        fn test_remove_elem_first() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &0), vec![2, 3])
-        }
-        #[test]
-        fn test_remove_elem_middle() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &1), vec![1, 3])
-        }
-        #[test]
-        fn test_remove_elem_last() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &2), vec![1, 2])
-        }
-        #[test]
-        fn test_change_order_move_first() {
-            assert_eq!(change_order(&vec![1, 2, 3], 1, 0), vec![1, 2, 3])
-        }
-        #[test]
-        fn test_change_order_move_middle() {
-            assert_eq!(change_order(&vec![1, 2, 3], 0, 1), vec![2, 1, 3])
-        }
-
-        #[test]
-        fn test_change_order_move_last() {
-            assert_eq!(change_order(&vec![1, 2, 3], 0, 2), vec![3, 1, 2])
-        }
-        #[test]
-        fn test_change_order_move_first_before_last() {
-            assert_eq!(change_order(&vec![1, 2, 3], 2, 0), vec![2, 1, 3])
-        }
-        #[test]
-        fn test_change_order_move_middle_before_last() {
-            assert_eq!(change_order(&vec![1, 2, 3], 2, 1), vec![1, 2, 3])
-        }
     }
 }
