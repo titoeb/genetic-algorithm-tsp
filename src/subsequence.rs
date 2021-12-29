@@ -27,6 +27,9 @@ impl Subsequence {
             .copied()
             .collect()
     }
+    pub fn index_is_in(&self, index: usize) -> bool {
+        self.start_index <= index && self.start_index + self.length >= index
+    }
 }
 
 #[cfg(test)]
@@ -81,6 +84,20 @@ mod tests {
                 Subsequence::new(1, 1).get_unique_elems(&Solution::new(vec![1, 2, 3, 4])),
                 HashSet::from([2])
             );
+        }
+    }
+    mod test_is_in {
+        use super::*;
+        #[test]
+        fn simple_range() {
+            assert!(Subsequence::new(3, 5).index_is_in(3));
+            assert!(Subsequence::new(3, 5).index_is_in(8));
+            assert!(!Subsequence::new(3, 5).index_is_in(9));
+            assert!(!Subsequence::new(3, 5).index_is_in(2));
+        }
+        #[test]
+        fn empty_range() {
+            assert!(Subsequence::new(0, 0).index_is_in(0));
         }
     }
 }
