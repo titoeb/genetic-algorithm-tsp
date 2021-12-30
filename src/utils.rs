@@ -2,6 +2,7 @@ use crate::solution::Solution;
 use crate::subsequence::Subsequence;
 use rand::Rng;
 use std::cmp::max;
+use std::collections::HashSet;
 use std::ops::Range;
 
 pub fn get_elem_from_range<T>(range: Range<T>) -> T
@@ -34,11 +35,57 @@ pub fn remove_elem(mut data: Vec<usize>, elem_idx: &usize) -> Vec<usize> {
 }
 
 pub fn ordered_crossover(
-    parent_a: Solution,
-    parent_b: Solution,
+    parent_a: &Solution,
+    parent_b: &Solution,
     subsequence: Subsequence,
 ) -> Solution {
-    unimplemented!();
+    let subsequence_elems = subsequence.get_unique_elems(parent_a);
+    let mut children: Vec<Option<usize>> = vec![None; parent_a.indexes.len()];
+    let mut available_indexes: HashSet<usize> = (0..parent_a.indexes.len()).collect();
+
+    // Rule 1: Take subsequence from parent_a, indexes at which elements from sequence
+    // occur are taken from parent_a as well.
+    for index in 0..parent_a.indexes.len() {
+        if subsequence.index_is_in(index) {
+            // Fill in the subsequence from `parent_a`.
+            children[index] = Some(parent_a.indexes[index]);
+            available_indexes.remove(&parent_a.indexes[index]);
+        } else {
+            // Fill in the elems in the subsequence with elems from `parent_a`.
+            if subsequence_elems.contains(&parent_b.indexes[index]) {
+                children[index] = Some(parent_a.indexes[index]);
+                available_indexes.remove(&parent_a.indexes[index]);
+            }
+        }
+    }
+    // Missing elements are filled with parent_b, if the value is still available, else parent_a if that
+    // value is still available.
+    for index in 0..parent_a.indexes.len() {
+        if children[index].is_none() {
+            if available_indexes.contains(&parent_b.indexes[index]) {
+                available_indexes.remove(&parent_b.indexes[index]);
+                children[index] = Some(parent_b.indexes[index]);
+            } else if available_indexes.contains(&parent_a.indexes[index]) {
+                available_indexes.remove(&parent_a.indexes[index]);
+                children[index] = Some(parent_a.indexes[index]);
+            }
+        }
+    }
+
+    // Final fallback, if a value is still missing, just take the smallest value first.
+    let mut remaining_indexes: Vec<usize> = available_indexes.iter().cloned().collect();
+    remaining_indexes.sort_unstable();
+    Solution {
+        indexes: (0..parent_a.indexes.len())
+            .map(|index| {
+                if children[index].is_none() {
+                    remaining_indexes.pop().unwrap()
+                } else {
+                    children[index].unwrap()
+                }
+            })
+            .collect(),
+    }
 }
 
 #[cfg(test)]
@@ -140,6 +187,106 @@ mod tests {
         #[test]
         fn test_change_order_move_middle_before_last() {
             assert_eq!(change_order(&vec![1, 2, 3], 2, 1), vec![1, 2, 3])
+        }
+    }
+    mod test_ordered_crossover {
+        use super::*;
+        #[test]
+        fn simple_test() {
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![3, 2, 0, 1]
+                    },
+                    &Solution {
+                        indexes: vec![1, 2, 3, 0]
+                    },
+                    Subsequence {
+                        start_index: 1,
+                        length: 2
+                    }
+                )
+                .indexes,
+                vec![3, 2, 0, 1]
+            )
+        }
+        #[test]
+        fn only_a() {
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![3, 2, 0, 1]
+                    },
+                    &Solution {
+                        indexes: vec![1, 2, 3, 0]
+                    },
+                    Subsequence {
+                        start_index: 0,
+                        length: 4
+                    }
+                )
+                .indexes,
+                vec![3, 2, 0, 1]
+            )
+        }
+        #[test]
+        fn only_b() {
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![3, 2, 0, 1]
+                    },
+                    &Solution {
+                        indexes: vec![1, 2, 3, 0]
+                    },
+                    Subsequence {
+                        start_index: 0,
+                        length: 0
+                    }
+                )
+                .indexes,
+                vec![1, 2, 3, 0]
+            )
+        }
+        #[test]
+        fn test_from_online_example() {
+            // Example taken from
+            // https://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![8, 4, 7, 3, 6, 2, 5, 1, 9, 0]
+                    },
+                    &Solution {
+                        indexes: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                    },
+                    Subsequence {
+                        start_index: 3,
+                        length: 5
+                    }
+                )
+                .indexes,
+                vec![0, 4, 7, 3, 6, 2, 5, 1, 8, 9]
+            )
+        }
+        #[test]
+        fn larger_examples() {
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![0, 12, 7, 3, 9, 8, 11, 5, 13, 1, 4, 6, 10, 15, 2, 14],
+                    },
+                    &Solution {
+                        indexes: vec![7, 10, 15, 12, 2, 9, 5, 3, 1, 6, 4, 13, 14, 11, 8, 0],
+                    },
+                    Subsequence {
+                        start_index: 13,
+                        length: 2
+                    }
+                )
+                .indexes,
+                vec![0, 10, 7, 12, 9, 8, 5, 3, 1, 6, 4, 13, 14, 15, 2, 11]
+            )
         }
     }
 }
