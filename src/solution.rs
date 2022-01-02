@@ -1,3 +1,4 @@
+use crate::distance_mat::DistanceMat;
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
@@ -39,6 +40,9 @@ impl Solution {
             other,
             Subsequence::random_subsequence(self.indexes.len()),
         )
+    }
+    pub fn fitness(&self, distance_mat: &DistanceMat) -> f64 {
+        distance_mat.get_distance(self)
     }
 }
 
@@ -95,6 +99,19 @@ mod tests {
                 valid_permutation(&result.indexes, &solution_a.indexes);
             }
             assert!(n_no_crossover <= n_tests / 5);
+        }
+    }
+    mod test_fitness {
+        use super::*;
+        #[test]
+        fn simple_functionality_test() {
+            let distance_mat = DistanceMat::new(vec![
+                vec![0.0, 2.0, 4.0],
+                vec![2.0, 0.0, 6.0],
+                vec![4.0, 6.0, 0.0],
+            ]);
+            let solution = Solution::new(vec![1, 2, 0]);
+            assert_eq!(solution.fitness(&distance_mat), 12.0);
         }
     }
 }
