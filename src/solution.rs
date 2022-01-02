@@ -1,4 +1,5 @@
-use crate::utils::{change_order, get_elem_from_range, remove_elem};
+use crate::subsequence::Subsequence;
+use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
 
 use std::cmp::max;
@@ -32,8 +33,12 @@ impl Solution {
             },
         }
     }
-    pub fn crossover(self, _other: &Solution) -> Self {
-        unimplemented!()
+    pub fn crossover(&self, other: &Solution) -> Self {
+        ordered_crossover(
+            self,
+            other,
+            Subsequence::random_subsequence(self.indexes.len()),
+        )
     }
 }
 
@@ -65,6 +70,31 @@ mod tests {
                 Solution::new(vec![1, 2, 3, 4]).mutate(1.0).indexes,
                 vec![1, 2, 3, 4]
             )
+        }
+    }
+    mod test_crossover {
+        use super::*;
+        use crate::test_utils::valid_permutation;
+
+        #[test]
+        fn random_test_10() {
+            let n_tests = 1000;
+            let solution_a = Solution {
+                indexes: vec![0, 12, 7, 3, 9, 8, 11, 5, 13, 1, 4, 6, 10, 15, 2, 14],
+            };
+            let solution_b = Solution {
+                indexes: vec![7, 10, 15, 12, 2, 9, 5, 3, 1, 6, 4, 13, 14, 11, 8, 0],
+            };
+            let mut n_no_crossover = 0;
+            for _ in 1..n_tests {
+                let result = solution_a.crossover(&solution_b);
+                if result.indexes == solution_a.indexes || result.indexes == solution_b.indexes {
+                    n_no_crossover += 1;
+                }
+                valid_permutation(&result.indexes, &solution_a.indexes);
+                valid_permutation(&result.indexes, &solution_a.indexes);
+            }
+            assert!(n_no_crossover <= n_tests / 5);
         }
     }
 }
