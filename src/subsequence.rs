@@ -28,7 +28,7 @@ impl Subsequence {
             .collect()
     }
     pub fn index_is_in(&self, index: usize) -> bool {
-        self.start_index <= index && self.start_index + self.length >= index
+        self.start_index <= index && self.start_index + self.length > index
     }
 }
 
@@ -91,13 +91,17 @@ mod tests {
         #[test]
         fn simple_range() {
             assert!(Subsequence::new(3, 5).index_is_in(3));
-            assert!(Subsequence::new(3, 5).index_is_in(8));
+            assert!(Subsequence::new(3, 5).index_is_in(7));
             assert!(!Subsequence::new(3, 5).index_is_in(9));
             assert!(!Subsequence::new(3, 5).index_is_in(2));
         }
         #[test]
+        fn small_range() {
+            assert!(Subsequence::new(0, 1).index_is_in(0));
+        }
+        #[test]
         fn empty_range() {
-            assert!(Subsequence::new(0, 0).index_is_in(0));
+            assert!(!Subsequence::new(0, 0).index_is_in(0));
         }
     }
 }
