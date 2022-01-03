@@ -103,15 +103,12 @@ mod tests {
     }
     mod test_fitness {
         use super::*;
+        use crate::test_utils::test_dist_mat;
         #[test]
         fn simple_functionality_test() {
-            let distance_mat = DistanceMat::new(vec![
-                vec![0.0, 2.0, 4.0],
-                vec![2.0, 0.0, 6.0],
-                vec![4.0, 6.0, 0.0],
-            ]);
+            let distance_mat = test_dist_mat();
             let solution = Solution::new(vec![1, 2, 0]);
-            assert_eq!(solution.fitness(&distance_mat), 12.0);
+            assert_eq!(solution.fitness(&distance_mat), 6.0);
         }
     }
 }
