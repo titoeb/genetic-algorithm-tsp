@@ -4,7 +4,7 @@ use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_
 use rand::seq::SliceRandom;
 
 use std::cmp::max;
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Solution {
     pub indexes: Vec<usize>,
 }
