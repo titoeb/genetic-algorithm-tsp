@@ -4,7 +4,7 @@ use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_
 use rand::seq::SliceRandom;
 
 use std::cmp::max;
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Solution {
     pub indexes: Vec<usize>,
 }
@@ -29,7 +29,7 @@ impl Solution {
                         &(max(put_before_idx, 1) - 1),
                     )
                     .choose(&mut rand::thread_rng())
-                    .unwrap(),
+                    .unwrap_or(&((put_before_idx + 1) % self.indexes.len())),
                 )
             },
         }
@@ -51,6 +51,7 @@ mod tests {
     use super::*;
     mod test_solution {
         use super::*;
+        use crate::test_utils::valid_permutation;
         #[test]
         fn test_constructor() {
             let solution = Solution::new(vec![1, 2, 3, 4]);
@@ -74,6 +75,21 @@ mod tests {
                 Solution::new(vec![1, 2, 3, 4]).mutate(1.0).indexes,
                 vec![1, 2, 3, 4]
             )
+        }
+        #[test]
+        fn test_mutuate_100_prob_3_elems() {
+            assert_ne!(
+                Solution::new(vec![1, 2, 3]).mutate(1.0).indexes,
+                vec![1, 2, 3]
+            )
+        }
+        #[test]
+        fn test_mutate_simple_run() {
+            let test_solution = Solution::new(vec![1, 2, 0]);
+            valid_permutation(
+                &test_solution.indexes,
+                &test_solution.clone().mutate(0.5).indexes,
+            );
         }
     }
     mod test_crossover {
@@ -103,15 +119,12 @@ mod tests {
     }
     mod test_fitness {
         use super::*;
+        use crate::test_utils::test_dist_mat;
         #[test]
         fn simple_functionality_test() {
-            let distance_mat = DistanceMat::new(vec![
-                vec![0.0, 2.0, 4.0],
-                vec![2.0, 0.0, 6.0],
-                vec![4.0, 6.0, 0.0],
-            ]);
+            let distance_mat = test_dist_mat();
             let solution = Solution::new(vec![1, 2, 0]);
-            assert_eq!(solution.fitness(&distance_mat), 12.0);
+            assert_eq!(solution.fitness(&distance_mat), 6.0);
         }
     }
 }
