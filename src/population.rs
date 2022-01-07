@@ -61,6 +61,18 @@ impl Population {
     }
 }
 
+pub fn evolve_population(
+    initial_population: Population,
+    n_generations: usize,
+    size_generation: usize,
+    distance_mat: &DistanceMat,
+) -> Population {
+    (0..n_generations).fold(initial_population, |pop, _| {
+        pop.evolve(0.5)
+            .get_fittest_population(size_generation, distance_mat)
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
