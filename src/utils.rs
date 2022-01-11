@@ -5,7 +5,6 @@ use rand::thread_rng;
 use rand::Rng;
 use std::cmp::max;
 use std::cmp::Ordering;
-use std::collections::HashSet;
 use std::ops::Range;
 
 pub fn get_elem_from_range<T>(range: Range<T>) -> T
@@ -42,53 +41,40 @@ pub fn ordered_crossover(
     parent_b: &Solution,
     subsequence: Subsequence,
 ) -> Solution {
-    let subsequence_elems = subsequence.get_unique_elems(parent_a);
-    let mut children: Vec<Option<usize>> = vec![None; parent_a.indexes.len()];
-    let mut available_indexes: HashSet<usize> = (0..parent_a.indexes.len()).collect();
-
-    // Rule 1: Take subsequence from parent_a, indexes at which elements from sequence
-    // occur are taken from parent_a as well.
-    for index in 0..parent_a.indexes.len() {
-        if subsequence.index_is_in(index) {
-            // Fill in the subsequence from `parent_a`.
-            children[index] = Some(parent_a.indexes[index]);
-            available_indexes.remove(&parent_a.indexes[index]);
-        } else {
-            // Fill in the elems in the subsequence with elems from `parent_a`.
-            if subsequence_elems.contains(&parent_b.indexes[index]) {
-                children[index] = Some(parent_a.indexes[index]);
-                available_indexes.remove(&parent_a.indexes[index]);
-            }
+    let mut child: Vec<usize> = Vec::new();
+    let mapped_selection = subsequence.get_values_in(&parent_a.indexes).unwrap();
+    // First push elements in subsequence of receiver, that are not in subsequence of donor.
+    for elem in subsequence.get_values_in(&parent_b.indexes).unwrap() {
+        if !is_in(*elem, mapped_selection) {
+            child.push(*elem);
         }
     }
-    // Missing elements are filled with parent_b, if the value is still available, else parent_a if that
-    // value is still available.
-    for index in 0..parent_a.indexes.len() {
-        if children[index].is_none() {
-            if available_indexes.contains(&parent_b.indexes[index]) {
-                available_indexes.remove(&parent_b.indexes[index]);
-                children[index] = Some(parent_b.indexes[index]);
-            } else if available_indexes.contains(&parent_a.indexes[index]) {
-                available_indexes.remove(&parent_a.indexes[index]);
-                children[index] = Some(parent_a.indexes[index]);
-            }
+    // Push elements in subsequence of donor.
+    for elem in mapped_selection {
+        child.push(*elem);
+    }
+    // Push element after subsequence from receiver, that are not in subsequence of donor.
+    for elem in subsequence.get_values_after(&parent_b.indexes).unwrap() {
+        if !is_in(*elem, mapped_selection) {
+            child.push(*elem);
         }
     }
-
-    // Final fallback, if a value is still missing, just take the smallest value first.
-    let mut remaining_indexes: Vec<usize> = available_indexes.iter().cloned().collect();
-    remaining_indexes.sort_unstable();
-    Solution {
-        indexes: (0..parent_a.indexes.len())
-            .map(|index| {
-                if children[index].is_none() {
-                    remaining_indexes.pop().unwrap()
-                } else {
-                    children[index].unwrap()
-                }
-            })
-            .collect(),
+    // Push element before subsequence from receiver, that are not in subsequence of donor.
+    for elem in subsequence.get_values_before(&parent_b.indexes).unwrap() {
+        if !is_in(*elem, mapped_selection) {
+            child.push(*elem);
+        }
     }
+    Solution { indexes: child }
+}
+
+pub fn is_in(value: usize, elements: &[usize]) -> bool {
+    for elem in elements {
+        if value == *elem {
+            return true;
+        }
+    }
+    false
 }
 
 pub fn random_permutation(vec: &[usize]) -> Vec<usize> {
@@ -211,6 +197,26 @@ mod tests {
     mod test_ordered_crossover {
         use super::*;
         #[test]
+        fn test_from_paper() {
+            // test taken from example in https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.1898&rep=rep1&type=pdf.
+            assert_eq!(
+                ordered_crossover(
+                    &Solution {
+                        indexes: vec![9, 8, 4, 5, 6, 7, 1, 3, 2]
+                    },
+                    &Solution {
+                        indexes: vec![8, 7, 1, 2, 3, 0, 9, 5, 4]
+                    },
+                    Subsequence {
+                        start_index: 3,
+                        length: 3
+                    }
+                )
+                .indexes,
+                vec![2, 3, 0, 5, 6, 7, 9, 4, 8, 1]
+            )
+        }
+        #[test]
         fn simple_test() {
             assert_eq!(
                 ordered_crossover(
@@ -285,7 +291,7 @@ mod tests {
                     }
                 )
                 .indexes,
-                vec![0, 4, 7, 3, 6, 2, 5, 1, 8, 9]
+                vec![4, 7, 3, 6, 2, 5, 1, 8, 9, 0]
             )
         }
         #[test]
@@ -304,8 +310,27 @@ mod tests {
                     }
                 )
                 .indexes,
-                vec![0, 10, 7, 12, 9, 8, 5, 3, 1, 6, 4, 13, 14, 15, 2, 11]
+                vec![11, 8, 15, 2, 0, 7, 10, 12, 9, 5, 3, 1, 6, 4, 13, 14,]
             )
+        }
+    }
+    mod test_is_in {
+        use super::*;
+        #[test]
+        fn not_in() {
+            assert_eq!(is_in(0, &[1, 2, 3]), false)
+        }
+        #[test]
+        fn not_in_empty_sequence() {
+            assert_eq!(is_in(0, &Vec::<usize>::new()), false)
+        }
+        #[test]
+        fn value_is_in() {
+            assert_eq!(is_in(0, &[1, 0, 3]), true)
+        }
+        #[test]
+        fn value_is_in_duplicated() {
+            assert_eq!(is_in(0, &[0, 1, 0, 3]), true)
         }
     }
     mod test_random_permutation {

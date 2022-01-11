@@ -1,6 +1,4 @@
-use crate::solution::Solution;
 use crate::utils::get_elem_from_range;
-use std::collections::HashSet;
 #[derive(Debug)]
 pub struct Subsequence {
     pub start_index: usize,
@@ -21,14 +19,26 @@ impl Subsequence {
             length: get_elem_from_range(1..(max - start_index - 1)),
         }
     }
-    pub fn get_unique_elems(&self, solution: &Solution) -> HashSet<usize> {
-        solution.indexes[self.start_index..(self.start_index + self.length)]
-            .iter()
-            .copied()
-            .collect()
+    pub fn get_values_in<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
+        if self.start_index + self.length <= sequence.len() {
+            Some(&sequence[self.start_index..(self.start_index + self.length)])
+        } else {
+            None
+        }
     }
-    pub fn index_is_in(&self, index: usize) -> bool {
-        self.start_index <= index && self.start_index + self.length > index
+    pub fn get_values_before<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
+        if self.start_index <= sequence.len() {
+            Some(&sequence[..self.start_index])
+        } else {
+            None
+        }
+    }
+    pub fn get_values_after<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
+        if self.start_index + self.length <= sequence.len() {
+            Some(&sequence[(self.start_index + self.length)..])
+        } else {
+            None
+        }
     }
 }
 
@@ -60,48 +70,118 @@ mod tests {
             assert!(random_subsequence.start_index + random_subsequence.length < max_value);
         }
     }
-    mod test_get_unique_elems {
+    mod test_get_values_in_subsequence {
         use super::*;
-        use crate::solution::Solution;
-        use std::collections::HashSet;
         #[test]
-        fn test_trivial_range() {
-            assert_eq!(
-                Subsequence::new(0, 4).get_unique_elems(&Solution::new(vec![1, 2, 3, 4])),
-                HashSet::from([1, 2, 3, 4])
-            );
+        fn partial_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 3,
+                length: 4,
+            };
+            assert_eq!(subsequence.get_values_in(&sequence), Some(&sequence[3..=6]))
         }
         #[test]
-        fn test_actual_range() {
-            assert_eq!(
-                Subsequence::new(1, 2).get_unique_elems(&Solution::new(vec![1, 2, 3, 4])),
-                HashSet::from([2, 3])
-            );
+        fn full_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 0,
+                length: 10,
+            };
+            assert_eq!(subsequence.get_values_in(&sequence), Some(&sequence[0..]))
         }
         #[test]
-        fn test_range_len_1() {
-            assert_eq!(
-                Subsequence::new(1, 1).get_unique_elems(&Solution::new(vec![1, 2, 3, 4])),
-                HashSet::from([2])
-            );
+        fn too_short() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 5,
+                length: 12,
+            };
+            assert_eq!(subsequence.get_values_in(&sequence), None)
         }
     }
-    mod test_is_in {
+    mod test_get_values_before_subsequence {
         use super::*;
         #[test]
-        fn simple_range() {
-            assert!(Subsequence::new(3, 5).index_is_in(3));
-            assert!(Subsequence::new(3, 5).index_is_in(7));
-            assert!(!Subsequence::new(3, 5).index_is_in(9));
-            assert!(!Subsequence::new(3, 5).index_is_in(2));
+        fn partial_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 3,
+                length: 4,
+            };
+            assert_eq!(
+                subsequence.get_values_before(&sequence),
+                Some(&sequence[0..3])
+            )
         }
         #[test]
-        fn small_range() {
-            assert!(Subsequence::new(0, 1).index_is_in(0));
+        fn full_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 0,
+                length: 10,
+            };
+            assert_eq!(
+                subsequence.get_values_before(&sequence),
+                Some(&Vec::<usize>::new()[0..])
+            )
         }
         #[test]
-        fn empty_range() {
-            assert!(!Subsequence::new(0, 0).index_is_in(0));
+        fn too_short_for_sequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 5,
+                length: 12,
+            };
+            assert_eq!(
+                subsequence.get_values_before(&sequence),
+                Some(&sequence[0..5])
+            )
+        }
+        #[test]
+        fn too_short_for_before_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 11,
+                length: 12,
+            };
+            assert_eq!(subsequence.get_values_before(&sequence), None)
+        }
+    }
+    mod test_get_values_after_subsequence {
+        use super::*;
+        #[test]
+        fn partial_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 3,
+                length: 4,
+            };
+            assert_eq!(
+                subsequence.get_values_after(&sequence),
+                Some(&sequence[7..10])
+            )
+        }
+        #[test]
+        fn full_subsequence() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 0,
+                length: 10,
+            };
+            assert_eq!(
+                subsequence.get_values_after(&sequence),
+                Some(&Vec::<usize>::new()[0..])
+            )
+        }
+        #[test]
+        fn too_short() {
+            let sequence: Vec<usize> = (0..10).collect();
+            let subsequence = Subsequence {
+                start_index: 5,
+                length: 12,
+            };
+            assert_eq!(subsequence.get_values_after(&sequence), None)
         }
     }
 }
