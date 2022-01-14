@@ -1,19 +1,65 @@
 use crate::solution::Solution;
+
+/// A representation of a f64 based distance matrix.
 #[derive(Debug)]
 pub struct DistanceMat {
     distances: Vec<Vec<f64>>,
 }
 
 impl DistanceMat {
+    /// Create a new distance mat based on exising
+    /// distances.
+    ///
+    /// # Arguments
+    ///
+    /// * `distances` - The distances between all indexes 0..n. The matrix
+    /// is assumed to be symmetrical and the distance between an object and itself
+    /// (the diagonal) should be only 0.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// ```
     pub fn new(distances: Vec<Vec<f64>>) -> Self {
         DistanceMat { distances }
     }
+    /// Get the number of nodes in the distance matrix, e.g. one of its dimensions.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// println!("{}", distance_matrix.n_units());
+    /// ```
     pub fn n_units(&self) -> usize {
         self.distances.len()
     }
     // TODO: This has to return an `Result`, if there are fewer entries than
     // 2 in `solution` or there is any index in Solution that does not exist in
     // the dist matrix, return a custom error (too few entries / unkown elements)
+
+    /// Given a sequence of nodes (in a `Solution`-object) compute the distance for the round-
+    /// trip between node 0..0
+    ///
+    /// # Arguments
+    ///
+    /// * `solution` - The sequence of nodes that is visited and for which the round-trip-lenght
+    /// should be computed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// println!("{}", distance_matrix.get_distance(&Solution::new(vec![1,0,2])));
+    /// ```
     pub fn get_distance(&self, solution: &Solution) -> f64 {
         solution
             .indexes
