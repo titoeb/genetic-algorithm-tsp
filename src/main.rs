@@ -3,7 +3,17 @@ use genetic_algo::population::{evolve_population, Population};
 use std::fs;
 use std::time::Instant;
 
-fn benchmark_population(
+/// Compute the time in milliseconds that it takes for a genetic algorithm to run.
+///
+/// # Arguments
+///
+/// * `n_generations` - How many generations should the algorithm evolve?
+/// * `size_generation` - How many individuals should be selected at the end of each
+/// evolution step.
+/// * `dist_mat` - What is the distance matrix for your TSP.
+///
+/// ```
+pub fn benchmark_population(
     n_generations: usize,
     size_generation: usize,
     dist_mat: &DistanceMat,
