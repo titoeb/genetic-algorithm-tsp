@@ -1,3 +1,5 @@
+#![deny(rustdoc::missing_doc_code_examples)]
+#![deny(missing_docs)]
 //! # Genetic algorithms for solving TSPs.
 //!
 //! This crates contains utitlities to run genetic algorithms and solve Traveling Salesman Problems.
