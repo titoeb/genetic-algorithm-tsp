@@ -1,20 +1,55 @@
 use crate::distance_mat::DistanceMat;
+
 use crate::solution::Solution;
 use crate::utils::{argsort, random_permutation};
 use std::convert::From;
+use std::time::Instant;
 
+/// The `Population` is your current pools of solutions that you would to improve by evolving them.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Population {
+    /// An individual population is made from `solutions`, e.g. individuals that might your given problem
+    /// better of worse.
     pub solutions: Vec<Solution>,
 }
-
+// Convert a Vector of solutioons to a population.
 impl From<Vec<Solution>> for Population {
+    /// Create a new Population from a vector of solutions.
+    ///
+    /// # Arguments
+    ///
+    /// * `solutions` - The solutions you collected so far and would like to put into your
+    /// population.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// ```
     fn from(solutions: Vec<Solution>) -> Self {
         Population { solutions }
     }
 }
 
 impl Population {
+    /// Create a new Population from a vector of solutions.
+    ///
+    /// # Arguments
+    ///
+    /// * `solutions` - The solutions you collected so far and would like to put into your
+    /// population.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// ```
     pub fn random(n_individuals: usize, n_objects: usize) -> Self {
         let all_objects = (0..n_objects).collect::<Vec<usize>>();
         Population {
@@ -23,12 +58,49 @@ impl Population {
                 .collect(),
         }
     }
-    fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<f64> {
+    /// Given your pool of current solutions, compute the fitness of your individuals to solve the
+    /// problem at hand.
+    ///
+    /// # Arguments
+    ///
+    /// * `distance_mat` - The distances between nodes that is neccessary to computes how well the solution
+    /// work in terms of the TSP
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// println!("Your population's fitnesses: {:?}", my_population.fitnesses(&distance_matrix));
+    /// ```
+    pub fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<f64> {
         self.solutions
             .iter()
             .map(|solution| solution.fitness(distance_mat))
             .collect()
     }
+    /// Get the n fittest individuals in your population.
+    ///
+    /// # Arguments
+    ///
+    /// * `n` - The number of individuals you would like to have.
+    /// * `distance_mat` - The distance matrix the fitness should be evaluated on.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// println!("Your fittest individual: {:?}", my_population.get_n_fittest(1, &distance_matrix));
+    /// ```
     pub fn get_n_fittest(&self, n: usize, distance_mat: &DistanceMat) -> Vec<Solution> {
         argsort(&self.fitnesses(distance_mat))
             .iter()
@@ -36,11 +108,52 @@ impl Population {
             .map(|idx| self.solutions[*idx].clone())
             .collect()
     }
+
+    /// Get the n fittest individuals in your population as new population object. This is typically used
+    /// to select the top n inidividuals, before continuing to evolve the population further.
+    ///
+    /// # Arguments
+    ///
+    /// * `n` - The number of individuals you would like to have.
+    /// * `distance_mat` - The distance matrix the fitness should be evaluated on.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// let my_fittest_population = my_population.get_fittest_population(2, &distance_matrix);
+    /// ```
     pub fn get_fittest_population(&self, n: usize, distance_mat: &DistanceMat) -> Population {
         Population {
             solutions: self.get_n_fittest(n, distance_mat),
         }
     }
+    /// Evolve your population.
+    ///
+    /// The evolution consists of the following stages:
+    /// 1) `crossover` between all 1,...,n solutions excluding the solution itself.
+    /// 2) `mutate` is applied to all individuals.
+    ///
+    /// # Arguments
+    ///
+    /// * `mutate_prob` - The probabilty of an inviduals beeing mutated. Is applied via `individuals.mutate`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::population::Population;
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// let evolved_population = my_population.evolve(0.5);
+    /// ```
     pub fn evolve(&self, mutate_prob: f32) -> Population {
         Population {
             solutions: self
@@ -51,8 +164,6 @@ impl Population {
                     self.solutions
                         .iter()
                         .skip(idx)
-                        // .map(|solution| main_solution.crossover(solution))
-                        // should look like:
                         .map(|solution| main_solution.crossover(solution).mutate(mutate_prob))
                 })
                 .flatten()
@@ -61,15 +172,39 @@ impl Population {
     }
 }
 
+/// Given an initial population evolve it for `n_generations` while keeping `size_generation`
+/// individuals. The final population will be returned.
+///
+/// # Arguments
+///
+/// * `initial_population` - Your initial population that should be evolved.
+/// * `n_generations` - How many times should your population be evolved?
+/// * `size_generation` - How many individuals should be kept after evolving it.
+/// * `distance_matrix` - The distance matrix on which the fitness will be computed on.
+///
+/// # Examples
+///
+/// ```
+/// use genetic_algo::population::{Population, evolve_population};
+/// use genetic_algo::solution::Solution;
+/// use genetic_algo::distance_mat::DistanceMat;
+///
+/// let evolved_population = evolve_population(
+///     Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]),
+///     10,
+///     10,
+///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]])
+/// );
+/// ```
 pub fn evolve_population(
     initial_population: Population,
     n_generations: usize,
     size_generation: usize,
-    distance_mat: &DistanceMat,
+    distance_matrix: &DistanceMat,
 ) -> Population {
     (0..n_generations).fold(initial_population, |pop, _| {
         pop.evolve(0.5)
-            .get_fittest_population(size_generation, distance_mat)
+            .get_fittest_population(size_generation, distance_matrix)
     })
 }
 /// Compute the time in milliseconds that it takes for a genetic algorithm to run.
