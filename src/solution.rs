@@ -2,16 +2,45 @@ use crate::distance_mat::DistanceMat;
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
-
 use std::cmp::max;
+
+/// The `Solution` is the individual for using generic algorithms to solve Traveling-Salesman-Problems.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Solution {
+    /// The order in which the nodes should be visited.
     pub indexes: Vec<usize>,
 }
 impl Solution {
+    /// Create a new solution based on a vector of indexes.
+    ///
+    /// # Arguments
+    ///
+    /// * `indexes` - The order in which the nodes are visited in the Traveling Salesman Problem.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// ```
     pub fn new(indexes: Vec<usize>) -> Self {
         Self { indexes }
     }
+    /// Randomly changes the order of two nodes in the solution
+    ///
+    /// # Arguments
+    ///
+    /// * `prob` - The probability with which the indexes will be changed
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_mutated_indiviual =  my_individual.mutate(1.0);
+    /// ```
     pub fn mutate(self, prob: f32) -> Self {
         Solution {
             indexes: if get_elem_from_range(0.0..1.0) > prob {
@@ -34,6 +63,23 @@ impl Solution {
             },
         }
     }
+    /// Crossover this invidual with another individual to create a new individual. Currently
+    /// uses the `ordered_crossover` algorithm.
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other individual you would like to use in the crossover individual.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::solution::Solution;
+    ///
+    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_individual = my_individual.crossover(
+    ///     &Solution::from(Solution::new(vec![1,0,2]))
+    /// );
+    /// ```
     pub fn crossover(&self, other: &Solution) -> Self {
         ordered_crossover(
             self,
@@ -41,8 +87,27 @@ impl Solution {
             Subsequence::random_subsequence(self.indexes.len()),
         )
     }
-    pub fn fitness(&self, distance_mat: &DistanceMat) -> f64 {
-        distance_mat.get_distance(self)
+    /// Compute how much distance the individual implies with its order of nodes
+    /// and the distance matrix.
+    ///
+    /// # Arguments
+    ///
+    /// * `distance_matrix` - Distance Matrix that determines the length of the proposed
+    /// solution
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::distance_mat::DistanceMat;
+    ///
+    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// println!("Fitness of your individual: {}", my_individual.fitness(
+    ///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]))
+    /// )
+    /// ```
+    pub fn fitness(&self, distance_matrix: &DistanceMat) -> f64 {
+        distance_matrix.get_distance(self)
     }
 }
 
