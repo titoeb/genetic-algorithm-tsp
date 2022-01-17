@@ -1,24 +1,46 @@
 use crate::utils::get_elem_from_range;
+
+/// The `Subsequence`-object only stores the indexes of a potential subsequences. Then based on a sequence, operations
+/// on that subsequence can be applied.
 #[derive(Debug)]
 pub struct Subsequence {
+    /// Where does the subsequence start?
     pub start_index: usize,
+    /// How long is the subsequence?
     pub length: usize,
 }
 
 impl Subsequence {
+    /// Create a new subseqence
+    ///
+    /// # Arguments
+    ///
+    /// * `start_index` - Where should the subsequence start?
+    /// * `length` - How long is the subsequence?
     pub fn new(start_index: usize, length: usize) -> Self {
         Subsequence {
             start_index,
             length,
         }
     }
-    pub fn random_subsequence(max: usize) -> Self {
-        let start_index = get_elem_from_range(0..(max - 2));
+    /// Create a new, random subsequence.
+    ///
+    /// # Arguments
+    ///
+    /// * `len_sequence` - What is the len of the actual sequence that should be subsequenced?
+    pub fn random_subsequence(len_sequence: usize) -> Self {
+        let start_index = get_elem_from_range(0..(len_sequence - 2));
         Subsequence {
             start_index,
-            length: get_elem_from_range(1..(max - start_index - 1)),
+            length: get_elem_from_range(1..(len_sequence - start_index - 1)),
         }
     }
+    /// Based on an actual sequence, get all elements that are in the subsequence
+    ///
+    /// # Arguments
+    ///
+    /// * `sequence` - The actual sequence that should be subsequenced
+    ///
     pub fn get_values_in<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
         if self.start_index + self.length <= sequence.len() {
             Some(&sequence[self.start_index..(self.start_index + self.length)])
@@ -26,6 +48,12 @@ impl Subsequence {
             None
         }
     }
+    /// Based on an actual sequence, get all elements that come before the subsequence
+    ///
+    /// # Arguments
+    ///
+    /// * `sequence` - The actual sequence that should be subsequenced
+    ///
     pub fn get_values_before<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
         if self.start_index <= sequence.len() {
             Some(&sequence[..self.start_index])
@@ -33,6 +61,12 @@ impl Subsequence {
             None
         }
     }
+    /// Based on an actual sequence, get all elements that come after the subsequence
+    ///
+    /// # Arguments
+    ///
+    /// * `sequence` - The actual sequence that should be subsequenced
+    ///
     pub fn get_values_after<'a>(&self, sequence: &'a [usize]) -> Option<&'a [usize]> {
         if self.start_index + self.length <= sequence.len() {
             Some(&sequence[(self.start_index + self.length)..])
