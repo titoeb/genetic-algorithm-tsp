@@ -1,12 +1,28 @@
 use crate::distance_mat::DistanceMat;
 use std::collections::HashSet;
+
+/// Get the test matrix that should be use tests.
+///
 pub fn test_dist_mat() -> DistanceMat {
+    // TODO: Either this matrix should be four dimensional
+    // or there should also be a four dimensional matrix.
     DistanceMat::new(vec![
         vec![0.0, 1.0, 2.0],
         vec![1.0, 0.0, 3.0],
         vec![2.0, 3.0, 0.0],
     ])
 }
+/// Test if a sequence is a valid permutation for another sequence.
+///
+/// Permuation means that it consists exactly all elements from the
+/// or original sequence (both have same lenght) but potentially in
+/// a different order.
+///
+/// # Arguments
+///
+/// * `sequence` - The actual sequence
+/// * `permutation` - The potential permutation of the original sequence that should be tested.
+///
 pub fn valid_permutation(sequence: &[usize], permutation: &[usize]) {
     assert_eq!(sequence.len(), permutation.len());
     assert!(sequence
