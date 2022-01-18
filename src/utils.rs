@@ -7,7 +7,7 @@ use std::cmp::max;
 use std::cmp::Ordering;
 use std::ops::Range;
 
-pub fn get_elem_from_range<T>(range: Range<T>) -> T
+pub fn get_random_elem_from_range<T>(range: Range<T>) -> T
 where
     T: std::cmp::PartialOrd + rand::distributions::uniform::SampleUniform,
 {

@@ -1,6 +1,6 @@
 use crate::distance_mat::DistanceMat;
 use crate::subsequence::Subsequence;
-use crate::utils::{change_order, get_elem_from_range, ordered_crossover, remove_elem};
+use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
 use std::cmp::max;
 
@@ -43,10 +43,10 @@ impl Solution {
     /// ```
     pub fn mutate(self, prob: f32) -> Self {
         Solution {
-            indexes: if get_elem_from_range(0.0..1.0) > prob {
+            indexes: if get_random_elem_from_range(0.0..1.0) > prob {
                 self.indexes
             } else {
-                let put_before_idx: usize = get_elem_from_range(0..(self.indexes.len() - 1));
+                let put_before_idx: usize = get_random_elem_from_range(0..(self.indexes.len() - 1));
                 change_order(
                     &self.indexes,
                     put_before_idx,

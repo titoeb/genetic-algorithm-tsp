@@ -1,4 +1,4 @@
-use crate::utils::get_elem_from_range;
+use crate::utils::get_random_elem_from_range;
 
 /// The `Subsequence`-object only stores the indexes of a potential subsequences. Then based on a sequence, operations
 /// on that subsequence can be applied.
@@ -29,10 +29,10 @@ impl Subsequence {
     ///
     /// * `len_sequence` - What is the len of the actual sequence that should be subsequenced?
     pub fn random_subsequence(len_sequence: usize) -> Self {
-        let start_index = get_elem_from_range(0..(len_sequence - 2));
+        let start_index = get_random_elem_from_range(0..(len_sequence - 2));
         Subsequence {
             start_index,
-            length: get_elem_from_range(1..(len_sequence - start_index - 1)),
+            length: get_random_elem_from_range(1..(len_sequence - start_index - 1)),
         }
     }
     /// Based on an actual sequence, get all elements that are in the subsequence
