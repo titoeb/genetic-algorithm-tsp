@@ -7,6 +7,12 @@ use std::cmp::max;
 use std::cmp::Ordering;
 use std::ops::Range;
 
+/// Get a random alement from a range.
+///
+/// # Arguments
+///
+/// * `range` - The range that should be sampled.
+///
 pub fn get_random_elem_from_range<T>(range: Range<T>) -> T
 where
     T: std::cmp::PartialOrd + rand::distributions::uniform::SampleUniform,
@@ -17,6 +23,15 @@ where
         range.start
     }
 }
+/// Generate a re-ordered vector.
+///
+/// # Arguments
+///
+/// * `data` - The original slice that should be re-ordered.
+/// * `put_before_index` - The element as position `move_idx` should be positioned before
+/// the element at `put_before_index`.
+/// * `move_idx` - The position of the element that should be moved.
+///
 pub fn change_order(data: &[usize], put_before_idx: usize, move_idx: usize) -> Vec<usize> {
     let mut new_data = data.to_owned();
     if put_before_idx != move_idx {
@@ -30,12 +45,25 @@ pub fn change_order(data: &[usize], put_before_idx: usize, move_idx: usize) -> V
     }
     new_data
 }
-
+/// Generate a new vector with by removing an element
+///
+/// # Arguments
+///
+/// * `data` - The original vector from the element should be removed.
+/// * `elem_idx` - The index of the element that should be removed.
+///
 pub fn remove_elem(mut data: Vec<usize>, elem_idx: &usize) -> Vec<usize> {
     data.remove(*elem_idx);
     data
 }
-
+/// The `ordered_crossover`-operator as defined in https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.1898&rep=rep1&type=pdf
+///
+/// # Arguments
+///
+/// * `parent_a` - The first parent from which the subsequence is taken.
+/// * `parent_b` - The second parent in which the subsequence is inputed.
+/// * `subsequence` - The actual subsequence that is taken.
+///
 pub fn ordered_crossover(
     parent_a: &Solution,
     parent_b: &Solution,
@@ -67,7 +95,13 @@ pub fn ordered_crossover(
     }
     Solution { indexes: child }
 }
-
+/// Does a sequence contain a certain value?
+///
+/// # Arguments
+///
+/// * `value` - The value that might be in the elements.
+/// * `elements` - The slice the value might be in.
+///
 pub fn is_in(value: usize, elements: &[usize]) -> bool {
     for elem in elements {
         if value == *elem {
@@ -76,13 +110,25 @@ pub fn is_in(value: usize, elements: &[usize]) -> bool {
     }
     false
 }
-
+/// Give a random permutation of a slice. No guarantee that
+/// the vector is actually changed.
+///
+/// # Arguments
+///
+/// * `vec` - The slice that should be permutated.
+///
 pub fn random_permutation(vec: &[usize]) -> Vec<usize> {
     let mut this_vec: Vec<usize> = vec.to_vec();
     this_vec.shuffle(&mut thread_rng());
     this_vec
 }
 
+/// Return the index of a sorted slice
+///
+/// # Arguments
+///
+/// * `data` - The slice that should be sorted by the index that is returned.
+///
 pub fn argsort<T: PartialOrd>(data: &[T]) -> Vec<usize> {
     let mut indices = (0..data.len()).collect::<Vec<_>>();
     indices.sort_by(|a_idx, b_idx| {
@@ -100,15 +146,15 @@ mod tests {
         use super::*;
         #[test]
         fn sample_int_range() {
-            get_elem_from_range(0..10);
+            get_random_elem_from_range(0..10);
         }
         #[test]
         fn sample_float_range() {
-            get_elem_from_range(0.0..1.0);
+            get_random_elem_from_range(0.0..1.0);
         }
         #[test]
         fn sample_empty_range() {
-            assert_eq!(get_elem_from_range(0..0), 0);
+            assert_eq!(get_random_elem_from_range(0..0), 0);
         }
     }
     mod test_remove_elem {
