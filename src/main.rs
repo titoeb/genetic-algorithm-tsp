@@ -18,10 +18,11 @@ fn main() {
     );
     for n_generations in (10..=510).step_by(100) {
         for size_generation in (10..=40).step_by(10) {
-            let run_time = benchmark_population(n_generations, size_generation, &distances);
+            let (run_time, minimal_loss) =
+                benchmark_population(n_generations, size_generation, &distances);
             println!(
-                "n_generations: {}, size_generation: {}, time: {} ms",
-                n_generations, size_generation, run_time
+                "n_generations: {}, size_generation: {}, time: {} ms, minimal loss: {}",
+                n_generations, size_generation, run_time, minimal_loss
             );
         }
     }

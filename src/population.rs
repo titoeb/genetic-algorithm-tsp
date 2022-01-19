@@ -223,10 +223,10 @@ pub fn benchmark_population(
     n_generations: usize,
     size_generation: usize,
     dist_mat: &DistanceMat,
-) -> u64 {
+) -> (u64, f64) {
     // End-to-end test: does the error of the solution get down?
     let before = Instant::now();
-    evolve_population(
+    let final_population = evolve_population(
         Population::random(size_generation, dist_mat.n_units()),
         n_generations,
         size_generation,
@@ -234,7 +234,10 @@ pub fn benchmark_population(
     );
     let duration = before.elapsed();
     let nanos = duration.subsec_nanos() as u64;
-    (1000 * 1000 * 1000 * duration.as_secs() + nanos) / (1000 * 1000)
+    (
+        (1000 * 1000 * 1000 * duration.as_secs() + nanos) / (1000 * 1000),
+        final_population.get_n_fittest(1, dist_mat)[0].fitness(dist_mat),
+    )
 }
 
 #[cfg(test)]
