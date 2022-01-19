@@ -53,9 +53,9 @@ impl Solution {
                     *remove_elem(
                         remove_elem(
                             (0..(self.indexes.len() - 1)).collect::<Vec<usize>>(),
-                            &put_before_idx,
+                            put_before_idx,
                         ),
-                        &(max(put_before_idx, 1) - 1),
+                        max(put_before_idx, 1) - 1,
                     )
                     .choose(&mut rand::thread_rng())
                     .unwrap_or(&((put_before_idx + 1) % self.indexes.len())),

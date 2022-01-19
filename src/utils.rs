@@ -52,8 +52,8 @@ pub fn change_order(data: &[usize], put_before_idx: usize, move_idx: usize) -> V
 /// * `data` - The original vector from the element should be removed.
 /// * `elem_idx` - The index of the element that should be removed.
 ///
-pub fn remove_elem(mut data: Vec<usize>, elem_idx: &usize) -> Vec<usize> {
-    data.remove(*elem_idx);
+pub fn remove_elem(mut data: Vec<usize>, elem_idx: usize) -> Vec<usize> {
+    data.remove(elem_idx);
     data
 }
 /// The `ordered_crossover`-operator as defined in https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.1898&rep=rep1&type=pdf
@@ -161,27 +161,27 @@ mod tests {
         use super::*;
         #[test]
         fn remove_first() {
-            assert_eq!(remove_elem(vec![1, 2, 3, 4], &0), vec![2, 3, 4]);
+            assert_eq!(remove_elem(vec![1, 2, 3, 4], 0), vec![2, 3, 4]);
         }
         #[test]
         fn remove_last() {
-            assert_eq!(remove_elem(vec![1, 2, 3, 4], &3), vec![1, 2, 3]);
+            assert_eq!(remove_elem(vec![1, 2, 3, 4], 3), vec![1, 2, 3]);
         }
         #[test]
         fn remove_middle() {
-            assert_eq!(remove_elem(vec![1, 2, 3, 4], &2), vec![1, 2, 4]);
+            assert_eq!(remove_elem(vec![1, 2, 3, 4], 2), vec![1, 2, 4]);
         }
         #[test]
         fn test_remove_elem_first() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &0), vec![2, 3])
+            assert_eq!(remove_elem(vec![1, 2, 3], 0), vec![2, 3])
         }
         #[test]
         fn test_remove_elem_middle() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &1), vec![1, 3])
+            assert_eq!(remove_elem(vec![1, 2, 3], 1), vec![1, 3])
         }
         #[test]
         fn test_remove_elem_last() {
-            assert_eq!(remove_elem(vec![1, 2, 3], &2), vec![1, 2])
+            assert_eq!(remove_elem(vec![1, 2, 3], 2), vec![1, 2])
         }
     }
     mod test_change_elem {
