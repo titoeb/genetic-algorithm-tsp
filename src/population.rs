@@ -163,8 +163,10 @@ impl Population {
                 .map(|(idx, main_solution)| {
                     self.solutions
                         .iter()
-                        .skip(idx)
-                        .map(|solution| main_solution.crossover(solution).mutate(mutate_prob))
+                        // Skip the solution itself, e.g. don't crossover the solution with itself.
+                        .enumerate()
+                        .filter(move |&(solution_index, _)| solution_index != idx)
+                        .map(|(_, solution)| main_solution.crossover(solution).mutate(mutate_prob))
                 })
                 .flatten()
                 .collect(),
