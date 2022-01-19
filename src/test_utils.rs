@@ -24,6 +24,11 @@ pub fn test_dist_mat() -> DistanceMat {
 /// * `permutation` - The potential permutation of the original sequence that should be tested.
 ///
 pub fn valid_permutation(sequence: &[usize], permutation: &[usize]) {
+    // If ..
+    // - the two sequences have the same length
+    // - sequence is a superset of permutation
+    // - permutation is a superset of sequence
+    // Then permutation is a valid permutation of sequence.
     assert_eq!(sequence.len(), permutation.len());
     assert!(sequence
         .iter()

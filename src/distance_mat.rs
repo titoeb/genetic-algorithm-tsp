@@ -65,6 +65,9 @@ impl DistanceMat {
             .indexes
             .iter()
             .fold(
+                // By folding the indexes we get the distances between 1-2, 2-3, ... , (n-1)-n.
+                // Then we are missing n-0, therefore that's the initial value we choose in the `fold`-
+                // operator.
                 (
                     self.distances[solution.indexes[solution.indexes.len() - 1]]
                         [solution.indexes[0]],

@@ -44,12 +44,17 @@ impl Solution {
     pub fn mutate(self, prob: f32) -> Self {
         Solution {
             indexes: if get_random_elem_from_range(0.0..1.0) > prob {
+                // With probabilty (1-prop) don't do any mutation.
                 self.indexes
             } else {
+                // else mutation is applied.
+                // To do so first sample an element to put another element in front of.
                 let put_before_idx: usize = get_random_elem_from_range(0..(self.indexes.len() - 1));
                 change_order(
                     &self.indexes,
                     put_before_idx,
+                    // Sample the element that should be put before `put_before_idx`. Should not be
+                    // the `put_before_idx` itself.
                     *remove_elem(
                         remove_elem(
                             (0..(self.indexes.len() - 1)).collect::<Vec<usize>>(),

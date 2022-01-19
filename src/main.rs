@@ -3,6 +3,7 @@ use genetic_algo::population::benchmark_population;
 use std::fs;
 
 fn main() {
+    // Read-in test distance matrix from `tests/test-data` folder.
     let distances = DistanceMat::new(
         fs::read_to_string("tests/test-data/distances.txt")
             .unwrap()

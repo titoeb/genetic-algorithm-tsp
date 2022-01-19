@@ -157,6 +157,7 @@ impl Population {
     pub fn evolve(&self, mutate_prob: f32) -> Population {
         Population {
             solutions: self
+                // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
                 .solutions
                 .iter()
                 .enumerate()
