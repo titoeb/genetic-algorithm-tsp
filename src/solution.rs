@@ -5,7 +5,7 @@ use rand::seq::SliceRandom;
 use std::cmp::max;
 
 /// The `Solution` is the individual for using generic algorithms to solve Traveling-Salesman-Problems.
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub struct Solution {
     /// The order in which the nodes should be visited.
     pub indexes: Vec<usize>,

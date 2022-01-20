@@ -2,6 +2,7 @@ use crate::distance_mat::DistanceMat;
 
 use crate::solution::Solution;
 use crate::utils::{argsort, random_permutation};
+use std::collections::HashSet;
 use std::convert::From;
 use std::time::Instant;
 
@@ -10,7 +11,7 @@ use std::time::Instant;
 pub struct Population {
     /// An individual population is made from `solutions`, e.g. individuals that might your given problem
     /// better of worse.
-    solutions: Vec<Solution>,
+    solutions: HashSet<Solution>,
 }
 // Convert a Vector of solutioons to a population.
 impl From<Vec<Solution>> for Population {
@@ -30,7 +31,9 @@ impl From<Vec<Solution>> for Population {
     /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// ```
     fn from(solutions: Vec<Solution>) -> Self {
-        Population { solutions }
+        Population {
+            solutions: solutions.into_iter().collect(),
+        }
     }
 }
 
@@ -52,11 +55,13 @@ impl Population {
     /// ```
     pub fn random(n_individuals: usize, n_objects: usize) -> Self {
         let all_objects = (0..n_objects).collect::<Vec<usize>>();
-        Population {
-            solutions: (0..n_individuals)
-                .map(|_| Solution::new(random_permutation(&all_objects)))
-                .collect(),
+        let mut solutions = HashSet::new();
+
+        while solutions.len() < n_individuals {
+            solutions.insert(Solution::new(random_permutation(&all_objects)));
         }
+
+        Population { solutions }
     }
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
     /// problem at hand.
@@ -135,9 +140,7 @@ impl Population {
     /// let my_fittest_population = my_population.get_fittest_population(2, &distance_matrix);
     /// ```
     pub fn get_fittest_population(&self, n: usize, distance_mat: &DistanceMat) -> Population {
-        Population {
-            solutions: self.get_n_fittest(n, distance_mat),
-        }
+        Population::from(self.get_n_fittest(n, distance_mat))
     }
     /// Evolve your population.
     ///
@@ -264,14 +267,14 @@ mod tests {
                 }
             ])
             .solutions,
-            vec![
+            HashSet::from([
                 Solution {
                     indexes: vec![0, 1, 2]
                 },
                 Solution {
                     indexes: vec![0, 2, 1]
                 }
-            ]
+            ])
         )
     }
     #[test]
@@ -290,13 +293,15 @@ mod tests {
             Solution::new(vec![1, 2, 0]),
             Solution::new(vec![1, 0]),
         ]);
-        assert_eq!(
-            population.fitnesses(&distance_mat),
-            vec![
-                (6.0, &Solution::new(vec![1, 2, 0]),),
-                (2.0, &Solution::new(vec![1, 0]),)
-            ],
-        )
+        let fitnesses = population.fitnesses(&distance_mat);
+        assert_eq!(fitnesses.len(), 2);
+
+        for element in vec![
+            (6.0, &Solution::new(vec![1, 2, 0])),
+            (2.0, &Solution::new(vec![1, 0])),
+        ] {
+            assert!(fitnesses.contains(&element))
+        }
     }
     mod test_get_n_fittest {
         use super::*;
@@ -366,7 +371,9 @@ mod tests {
             ]);
             assert_eq!(
                 population.get_fittest_population(0, &distance_mat),
-                Population { solutions: vec![] },
+                Population {
+                    solutions: HashSet::new()
+                },
             )
         }
         #[test]
@@ -380,7 +387,7 @@ mod tests {
             assert_eq!(
                 population.get_fittest_population(1, &distance_mat),
                 Population {
-                    solutions: vec![Solution::new(vec![1, 0]),],
+                    solutions: HashSet::from([Solution::new(vec![1, 0]),]),
                 },
             )
         }
@@ -395,7 +402,10 @@ mod tests {
             assert_eq!(
                 population.get_fittest_population(2, &distance_mat),
                 Population {
-                    solutions: vec![Solution::new(vec![1, 0]), Solution::new(vec![2, 0])],
+                    solutions: HashSet::from([
+                        Solution::new(vec![1, 0]),
+                        Solution::new(vec![2, 0])
+                    ]),
                 },
             )
         }
@@ -410,11 +420,11 @@ mod tests {
             assert_eq!(
                 population.get_fittest_population(3, &distance_mat),
                 Population {
-                    solutions: vec![
+                    solutions: HashSet::from([
                         Solution::new(vec![1, 0]),
                         Solution::new(vec![2, 0]),
                         Solution::new(vec![1, 2, 0]),
-                    ],
+                    ]),
                 },
             )
         }
@@ -424,15 +434,12 @@ mod tests {
         use crate::test_utils::valid_permutation;
         #[test]
         fn simple_test() {
-            let distance_mat = test_dist_mat();
             let population = Population::from(vec![
                 Solution::new(vec![1, 2, 0]),
                 Solution::new(vec![1, 0, 2]),
                 Solution::new(vec![2, 1, 0]),
             ]);
             let new_population = population.evolve(0.5);
-
-            assert_eq!(new_population.solutions.len(), 6);
             for solution in new_population.solutions {
                 valid_permutation(&vec![0, 1, 2], &solution.indexes);
             }
