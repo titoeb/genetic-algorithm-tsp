@@ -10,7 +10,7 @@ use std::time::Instant;
 pub struct Population {
     /// An individual population is made from `solutions`, e.g. individuals that might your given problem
     /// better of worse.
-    pub solutions: Vec<Solution>,
+    solutions: Vec<Solution>,
 }
 // Convert a Vector of solutioons to a population.
 impl From<Vec<Solution>> for Population {
