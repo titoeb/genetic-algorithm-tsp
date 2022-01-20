@@ -77,10 +77,10 @@ impl Population {
     /// let my_population = Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// println!("Your population's fitnesses: {:?}", my_population.fitnesses(&distance_matrix));
     /// ```
-    pub fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<f64> {
+    pub fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<(f64, &Solution)> {
         self.solutions
             .iter()
-            .map(|solution| solution.fitness(distance_mat))
+            .map(|solution| (solution.fitness(distance_mat), solution))
             .collect()
     }
     /// Get the n fittest individuals in your population.
@@ -102,11 +102,17 @@ impl Population {
     /// println!("Your fittest individual: {:?}", my_population.get_n_fittest(1, &distance_matrix));
     /// ```
     pub fn get_n_fittest(&self, n: usize, distance_mat: &DistanceMat) -> Vec<Solution> {
-        argsort(&self.fitnesses(distance_mat))
-            .iter()
-            .take(n)
-            .map(|idx| self.solutions[*idx].clone())
-            .collect()
+        let solutions_by_fitness = self.fitnesses(distance_mat);
+        argsort(
+            &solutions_by_fitness
+                .iter()
+                .map(|(fitness, _)| *fitness)
+                .collect::<Vec<f64>>(),
+        )
+        .iter()
+        .take(n)
+        .map(|idx| solutions_by_fitness[*idx].1.clone())
+        .collect()
     }
 
     /// Get the n fittest individuals in your population as new population object. This is typically used
@@ -284,7 +290,13 @@ mod tests {
             Solution::new(vec![1, 2, 0]),
             Solution::new(vec![1, 0]),
         ]);
-        assert_eq!(population.fitnesses(&distance_mat), vec![6.0, 2.0],)
+        assert_eq!(
+            population.fitnesses(&distance_mat),
+            vec![
+                (6.0, &Solution::new(vec![1, 2, 0]),),
+                (2.0, &Solution::new(vec![1, 0]),)
+            ],
+        )
     }
     mod test_get_n_fittest {
         use super::*;
