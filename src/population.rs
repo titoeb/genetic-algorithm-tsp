@@ -179,6 +179,7 @@ impl Population {
                         .map(|(_, solution)| main_solution.crossover(solution).mutate(mutate_prob))
                 })
                 .flatten()
+                .chain(self.solutions.iter().map(|elem| elem.clone()))
                 .collect(),
         }
     }
@@ -431,15 +432,27 @@ mod tests {
     }
     mod test_evolve {
         use super::*;
-        use crate::test_utils::valid_permutation;
+        use crate::test_utils::{test_dist_mat, valid_permutation};
         #[test]
         fn simple_test() {
+            let distance_mat = test_dist_mat();
             let population = Population::from(vec![
                 Solution::new(vec![1, 2, 0]),
                 Solution::new(vec![1, 0, 2]),
                 Solution::new(vec![2, 1, 0]),
             ]);
-            let new_population = population.evolve(0.5);
+
+            // Test at least three members after evolving.
+            // Test maximum fitness can never decrease.
+            let past_max_fitness =
+                population.get_n_fittest(1, &distance_mat)[0].fitness(&distance_mat);
+            let new_population = population.evolve(0.5).evolve(0.5);
+
+            assert!(
+                population.get_n_fittest(1, &distance_mat)[0].fitness(&distance_mat)
+                    <= past_max_fitness
+            );
+            assert!(new_population.solutions.len() >= 3);
             for solution in new_population.solutions {
                 valid_permutation(&vec![0, 1, 2], &solution.indexes);
             }
