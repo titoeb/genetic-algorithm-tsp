@@ -6,6 +6,8 @@
 
 /// Represent a distance Matrix as a Vec<Vec<f64>>.
 pub mod distance_mat;
+/// Traits used for abstraction of gen-algo
+pub mod gen_traits;
 /// The `population`-module contains the main class of this crate which is the `Population`-class that contains
 /// your current subset of solutions and with which you can evolve them.
 pub mod population;

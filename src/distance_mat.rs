@@ -1,3 +1,4 @@
+use crate::gen_traits::CostData;
 use crate::solution::Solution;
 
 /// A representation of a f64 based distance matrix.
@@ -39,10 +40,6 @@ impl DistanceMat {
     pub fn n_units(&self) -> usize {
         self.distances.len()
     }
-    // TODO: This has to return an `Result`, if there are fewer entries than
-    // 2 in `solution` or there is any index in Solution that does not exist in
-    // the dist matrix, return a custom error (too few entries / unkown elements)
-
     /// Given a sequence of nodes (in a `Solution`-object) compute the distance for the round-
     /// trip between node 0..0
     ///
@@ -51,16 +48,7 @@ impl DistanceMat {
     /// * `solution` - The sequence of nodes that is visited and for which the round-trip-lenght
     /// should be computed.
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// use genetic_algo::distance_mat::DistanceMat;
-    /// use genetic_algo::solution::Solution;
-    ///
-    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
-    /// println!("{}", distance_matrix.compute_cost(&Solution::new(vec![1,0,2])));
-    /// ```
-    pub fn compute_cost(&self, solution: &Solution) -> f64 {
+    fn get_distance(&self, solution: &Solution) -> f64 {
         solution
             .indexes
             .iter()
@@ -81,6 +69,33 @@ impl DistanceMat {
                 },
             )
             .0
+    }
+}
+impl CostData for DistanceMat {
+    // TODO: This has to return an `Result`, if there are fewer entries than
+    // 2 in `solution` or there is any index in Solution that does not exist in
+    // the dist matrix, return a custom error (too few entries / unkown elements)
+
+    /// Given a sequence of nodes (in a `Solution`-object) compute the distance for the round-
+    /// trip between node 0..0
+    ///
+    /// # Arguments
+    ///
+    /// * `solution` - The sequence of nodes that is visited and for which the round-trip-lenght
+    /// should be computed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::gen_traits::CostData;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// println!("{}", distance_matrix.compute_cost(&Solution::new(vec![1,0,2])));
+    /// ```
+    fn compute_cost(&self, solution: &Solution) -> f64 {
+        self.get_distance(solution)
     }
 }
 
