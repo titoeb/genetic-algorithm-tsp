@@ -58,9 +58,9 @@ impl DistanceMat {
     /// use genetic_algo::solution::Solution;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
-    /// println!("{}", distance_matrix.get_distance(&Solution::new(vec![1,0,2])));
+    /// println!("{}", distance_matrix.compute_cost(&Solution::new(vec![1,0,2])));
     /// ```
-    pub fn get_distance(&self, solution: &Solution) -> f64 {
+    pub fn compute_cost(&self, solution: &Solution) -> f64 {
         solution
             .indexes
             .iter()
@@ -96,40 +96,40 @@ mod test_distance_mat {
     #[test]
     fn test_dist_same_node() {
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 0])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 0])),
             0.0
         );
     }
     #[test]
     fn test_dist_two_nodes() {
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 1])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 1])),
             2.0
         );
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 2])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 2])),
             4.0
         );
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![1, 2])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![1, 2])),
             6.0
         );
     }
     #[test]
     fn test_dist_three_nodes() {
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 1, 2])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 1, 2])),
             6.0
         );
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 2, 1])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 2, 1])),
             6.0
         );
     }
     #[test]
     fn test_dist_repeat_visit() {
         assert_eq!(
-            test_dist_mat().get_distance(&mut Solution::new(vec![0, 2, 1, 2])),
+            test_dist_mat().compute_cost(&mut Solution::new(vec![0, 2, 1, 2])),
             10.0
         );
     }
