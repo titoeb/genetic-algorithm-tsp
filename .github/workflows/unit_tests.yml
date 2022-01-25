@@ -17,7 +17,7 @@ jobs:
           override: true
           profile: minimal
       - name: Execute tests
-        run: cargo test | tee test_results.txt && tail -n 7 test_results.txt > test_results_pr_comment.txt
+        run: cargo test | tee test_results.txt > test_results_pr_comment.txt
         env:
           CARGO_INCREMENTAL: 0
           RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Cpanic=abort -Zpanic_abort_tests"
@@ -28,7 +28,7 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./test_results_pr_comment.txt
-      - name: Read Test results
+      - name: Post test results in PR.
         uses: actions-ecosystem/action-create-comment@v1
         if: always()
         with:
