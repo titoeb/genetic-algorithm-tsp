@@ -1,4 +1,5 @@
 use crate::distance_mat::DistanceMat;
+use crate::gen_traits::CostData;
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
@@ -111,7 +112,7 @@ impl Solution {
     ///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]))
     /// )
     /// ```
-    pub fn fitness(&self, distance_matrix: &DistanceMat) -> f64 {
+    pub fn fitness(&self, distance_matrix: &impl CostData) -> f64 {
         distance_matrix.compute_cost(self)
     }
 }
