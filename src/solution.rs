@@ -112,7 +112,7 @@ impl Solution {
     /// )
     /// ```
     pub fn fitness(&self, distance_matrix: &DistanceMat) -> f64 {
-        distance_matrix.get_distance(self)
+        distance_matrix.compute_cost(self)
     }
 }
 
