@@ -22,7 +22,7 @@ fn run_evolution() {
     );
     let population = Population::random(size_generation, distances.n_units());
     let max_fit = population.get_n_fittest(1, &distances)[0].fitness(&distances);
-    let population = evolve_population(population, n_generations, size_generation, &distances);
+    let population = evolve_population(population, n_generations, size_generation, &distances, 0);
     let max_fit_new = population.get_n_fittest(1, &distances)[0].fitness(&distances);
     // Assert after optimizing, the population is fitter then before.
     assert!(max_fit > max_fit_new);

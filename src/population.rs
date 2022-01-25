@@ -2,6 +2,7 @@ use crate::distance_mat::DistanceMat;
 
 use crate::solution::Solution;
 use crate::utils::{argsort, random_permutation};
+use crossbeam_utils::thread;
 use std::collections::HashSet;
 use std::convert::From;
 use std::time::Instant;
@@ -179,7 +180,7 @@ impl Population {
                         .map(|(_, solution)| main_solution.crossover(solution).mutate(mutate_prob))
                 })
                 .flatten()
-                .chain(self.solutions.iter().map(|elem| elem.clone()))
+                .chain(self.solutions.iter().cloned())
                 .collect(),
         }
     }
@@ -206,7 +207,8 @@ impl Population {
 ///     Population::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]),
 ///     10,
 ///     10,
-///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]])
+///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]),
+///     0
 /// );
 /// ```
 pub fn evolve_population(
@@ -214,11 +216,39 @@ pub fn evolve_population(
     n_generations: usize,
     size_generation: usize,
     distance_matrix: &DistanceMat,
+    n_jobs: usize,
 ) -> Population {
-    (0..n_generations).fold(initial_population, |pop, _| {
-        pop.evolve(0.5)
-            .get_fittest_population(size_generation, distance_matrix)
-    })
+    if n_jobs == 0 {
+        // single-thread
+        (0..n_generations).fold(initial_population, |pop, _| {
+            pop.evolve(0.5)
+                .get_fittest_population(size_generation, distance_matrix)
+        })
+    } else {
+        // Multi-threaded execution
+        thread::scope(|s| {
+            let mut result = Vec::new();
+            for _ in 0..n_jobs {
+                let this_population = initial_population.clone();
+                result.push(s.spawn(move |_| -> Vec<Solution> {
+                    (0..((n_generations / n_jobs) + 1))
+                        .fold(this_population, |pop, _| {
+                            pop.evolve(0.5)
+                                .get_fittest_population(size_generation, distance_matrix)
+                        })
+                        .get_n_fittest(size_generation, distance_matrix)
+                }))
+            }
+            Population::from(
+                result
+                    .into_iter()
+                    .map(|thread| thread.join().unwrap())
+                    .flatten()
+                    .collect::<Vec<Solution>>(),
+            )
+        })
+        .unwrap()
+    }
 }
 /// Compute the time in milliseconds that it takes for a genetic algorithm to run.
 ///
@@ -234,6 +264,7 @@ pub fn benchmark_population(
     n_generations: usize,
     size_generation: usize,
     dist_mat: &DistanceMat,
+    n_jobs: usize,
 ) -> (u64, f64) {
     // End-to-end test: does the error of the solution get down?
     let before = Instant::now();
@@ -242,6 +273,7 @@ pub fn benchmark_population(
         n_generations,
         size_generation,
         dist_mat,
+        n_jobs,
     );
     let duration = before.elapsed();
     let nanos = duration.subsec_nanos() as u64;

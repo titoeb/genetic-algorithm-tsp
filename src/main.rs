@@ -20,10 +20,22 @@ fn main() {
     for n_generations in (10..=510).step_by(100) {
         for size_generation in (10..=40).step_by(10) {
             let (run_time, minimal_loss) =
-                benchmark_population(n_generations, size_generation, &distances);
+                benchmark_population(n_generations, size_generation, &distances, 0);
             println!(
                 "n_generations: {}, size_generation: {}, time: {} ms, minimal loss: {}",
                 n_generations, size_generation, run_time, minimal_loss
+            );
+        }
+    }
+    println!("Running multi-threaded computation!");
+    let n_jobs = 8;
+    for n_generations in (10..=1100).step_by(100) {
+        for size_generation in (10..=80).step_by(10) {
+            let (run_time, minimal_loss) =
+                benchmark_population(n_generations, size_generation, &distances, n_jobs);
+            println!(
+                "n_generations: {}, size_generation: {}, time: {} ms, minimal loss: {}, n_jobs: {}",
+                n_generations, size_generation, run_time, minimal_loss, n_jobs
             );
         }
     }
