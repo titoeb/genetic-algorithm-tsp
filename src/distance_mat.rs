@@ -1,4 +1,4 @@
-use crate::gen_traits::CostData;
+use crate::gen_traits::{CostData, Individual};
 use crate::solution::Solution;
 
 /// A representation of a f64 based distance matrix.

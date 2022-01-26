@@ -1,4 +1,5 @@
 use crate::distance_mat::DistanceMat;
+use crate::gen_traits::Individual;
 
 use crate::solution::Solution;
 use crate::utils::{argsort, random_permutation};

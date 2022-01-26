@@ -1,5 +1,4 @@
-use crate::distance_mat::DistanceMat;
-use crate::gen_traits::CostData;
+use crate::gen_traits::{CostData, Individual};
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;
@@ -28,6 +27,8 @@ impl Solution {
     pub fn new(indexes: Vec<usize>) -> Self {
         Self { indexes }
     }
+}
+impl Individual for Solution {
     /// Randomly changes the order of two nodes in the solution
     ///
     /// # Arguments
@@ -38,11 +39,12 @@ impl Solution {
     ///
     /// ```
     /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::gen_traits::Individual;
     ///
     /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
     /// let my_mutated_indiviual =  my_individual.mutate(1.0);
     /// ```
-    pub fn mutate(self, prob: f32) -> Self {
+    fn mutate(self, prob: f32) -> Self {
         Solution {
             indexes: if get_random_elem_from_range(0.0..1.0) > prob {
                 // With probabilty (1-prop) don't do any mutation.
@@ -80,13 +82,14 @@ impl Solution {
     ///
     /// ```
     /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::gen_traits::Individual;
     ///
     /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
     /// let my_individual = my_individual.crossover(
     ///     &Solution::from(Solution::new(vec![1,0,2]))
     /// );
     /// ```
-    pub fn crossover(&self, other: &Solution) -> Self {
+    fn crossover(&self, other: &Solution) -> Self {
         ordered_crossover(
             self,
             other,
@@ -106,14 +109,16 @@ impl Solution {
     /// ```
     /// use genetic_algo::solution::Solution;
     /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algo::gen_traits::Individual;
     ///
     /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
     /// println!("Fitness of your individual: {}", my_individual.fitness(
     ///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]))
     /// )
     /// ```
-    pub fn fitness(&self, distance_matrix: &impl CostData) -> f64 {
-        distance_matrix.compute_cost(self)
+    ///
+    fn fitness(&self, cost_data: &impl CostData) -> f64 {
+        cost_data.compute_cost(self)
     }
 }
 
