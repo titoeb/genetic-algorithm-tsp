@@ -1,4 +1,5 @@
 use genetic_algo::distance_mat::DistanceMat;
+use genetic_algo::gen_traits::Individual;
 use genetic_algo::population::{evolve_population, Population};
 use std::fs;
 
