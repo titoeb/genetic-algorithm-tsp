@@ -8,9 +8,9 @@
 pub mod distance_mat;
 /// Traits used for abstraction of gen-algo
 pub mod gen_traits;
-/// The `population`-module contains the main class of this crate which is the `Population`-class that contains
+/// The `routes`-module contains the main class of this crate which is the `Routes`-class that contains
 /// your current subset of solutions and with which you can evolve them.
-pub mod population;
+pub mod routes;
 /// The `solution`-module contains the `Solution`-class, the individual element of the TSP that implements
 /// important methods like `crossover` or `mutate`.
 pub mod solution;

@@ -1,6 +1,6 @@
 use genetic_algo::distance_mat::DistanceMat;
 use genetic_algo::gen_traits::Individual;
-use genetic_algo::population::{evolve_population, Population};
+use genetic_algo::routes::{evolve_population, Routes};
 use std::fs;
 
 #[test]
@@ -21,10 +21,10 @@ fn run_evolution() {
             })
             .collect(),
     );
-    let population = Population::random(size_generation, distances.n_units());
-    let max_fit = population.get_n_fittest(1, &distances)[0].fitness(&distances);
-    let population = evolve_population(population, n_generations, size_generation, &distances, 0);
-    let max_fit_new = population.get_n_fittest(1, &distances)[0].fitness(&distances);
-    // Assert after optimizing, the population is fitter then before.
+    let routes = Routes::random(size_generation, distances.n_units());
+    let max_fit = routes.get_n_fittest(1, &distances)[0].fitness(&distances);
+    let routes = evolve_population(routes, n_generations, size_generation, &distances, 0);
+    let max_fit_new = routes.get_n_fittest(1, &distances)[0].fitness(&distances);
+    // Assert after optimizing, the routes is fitter then before.
     assert!(max_fit > max_fit_new);
 }
