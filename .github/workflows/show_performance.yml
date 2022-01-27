@@ -1,0 +1,32 @@
+on: pull_request
+name: Running performance test.
+permissions:
+  pull-requests: write
+  checks: write
+  contents: read
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository.
+        uses: actions/checkout@v2
+      - name: Install toolchain.
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+      - name: Run performance tests.
+        run: cargo run | tee performance_results_pr_comment.txt
+      - name: Read performance results
+        if: always()
+        id: performance_results
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./performance_results_pr_comment.txt
+      - name: Post performance results in PR.
+        uses: actions-ecosystem/action-create-comment@v1
+        if: always()
+        with:
+          github_token: ${{ secrets.github_token }}
+          body: ${{steps.performance_results.outputs.content}}
