@@ -72,6 +72,7 @@ impl DistanceMat {
     }
 }
 impl CostData for DistanceMat {
+    type Individual = Solution;
     // TODO: This has to return an `Result`, if there are fewer entries than
     // 2 in `solution` or there is any index in Solution that does not exist in
     // the dist matrix, return a custom error (too few entries / unkown elements)

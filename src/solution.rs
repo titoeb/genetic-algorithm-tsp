@@ -1,3 +1,4 @@
+use crate::distance_mat::DistanceMat;
 use crate::gen_traits::{CostData, Individual};
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
@@ -29,6 +30,7 @@ impl Solution {
     }
 }
 impl Individual for Solution {
+    type IndividualCost = DistanceMat;
     /// Randomly changes the order of two nodes in the solution
     ///
     /// # Arguments
@@ -117,8 +119,8 @@ impl Individual for Solution {
     /// )
     /// ```
     ///
-    fn fitness(&self, cost_data: &impl CostData) -> f64 {
-        cost_data.compute_cost(self)
+    fn fitness(&self, distance_mat: &DistanceMat) -> f64 {
+        distance_mat.compute_cost(self)
     }
 }
 
