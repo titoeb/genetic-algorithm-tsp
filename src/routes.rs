@@ -40,12 +40,12 @@ impl From<Vec<Solution>> for Routes {
 }
 
 impl Routes {
-    /// Create a new Population from a vector of solutions.
+    /// Create a new Population of routes by creating random invidiual routes.
     ///
     /// # Arguments
     ///
-    /// * `solutions` - The solutions you collected so far and would like to put into your
-    /// routes.
+    /// * `n_routse` - The number of routes your population of routes should contain.
+    /// * `route_length` - The length of an individual route.
     ///
     /// # Examples
     ///
@@ -55,21 +55,25 @@ impl Routes {
     ///
     /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// ```
-    pub fn random(n_individuals: usize, n_objects: usize) -> Self {
-        let all_objects = (0..n_objects).collect::<Vec<usize>>();
+    pub fn random(n_routes: usize, route_length: usize) -> Self {
+        let all_objects = (0..route_length).collect::<Vec<usize>>();
         let mut solutions = HashSet::new();
 
-        while solutions.len() < n_individuals {
+        while solutions.len() < n_routes {
             solutions.insert(Solution::new(random_permutation(&all_objects)));
         }
 
         Routes { solutions }
+    }
+    fn iter(&self) -> impl Iterator<Item = &Solution> {
+        self.solutions.iter()
     }
 }
 
 impl Population for Routes {
     type Individual = Solution;
     type CostData = DistanceMat;
+
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
     /// problem at hand.
     ///
@@ -91,8 +95,7 @@ impl Population for Routes {
     /// println!("Your routes's fitnesses: {:?}", routes.fitnesses(&distance_matrix));
     /// ```
     fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<(f64, &Solution)> {
-        self.solutions
-            .iter()
+        self.iter()
             .map(|solution| (solution.fitness(distance_mat), solution))
             .collect()
     }
@@ -179,7 +182,6 @@ impl Population for Routes {
         Routes {
             solutions: self
                 // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
-                .solutions
                 .iter()
                 .enumerate()
                 .map(|(idx, main_solution)| {
