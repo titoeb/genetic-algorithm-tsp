@@ -1,5 +1,5 @@
 use crate::distance_mat::DistanceMat;
-use crate::gen_traits::Individual;
+use crate::gen_traits::{CostData, Individual, Population};
 
 use crate::solution::Solution;
 use crate::utils::{argsort, random_permutation};
@@ -65,6 +65,11 @@ impl Routes {
 
         Routes { solutions }
     }
+}
+
+impl Population for Routes {
+    type Individual = Solution;
+    type CostData = DistanceMat;
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
     /// problem at hand.
     ///
@@ -79,12 +84,13 @@ impl Routes {
     /// use genetic_algo::routes::Routes;
     /// use genetic_algo::solution::Solution;
     /// use genetic_algo::distance_mat::DistanceMat;
+    /// use crate::genetic_algo::gen_traits::Population;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// println!("Your routes's fitnesses: {:?}", routes.fitnesses(&distance_matrix));
     /// ```
-    pub fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<(f64, &Solution)> {
+    fn fitnesses(&self, distance_mat: &DistanceMat) -> Vec<(f64, &Solution)> {
         self.solutions
             .iter()
             .map(|solution| (solution.fitness(distance_mat), solution))
@@ -103,12 +109,14 @@ impl Routes {
     /// use genetic_algo::routes::Routes;
     /// use genetic_algo::solution::Solution;
     /// use genetic_algo::distance_mat::DistanceMat;
+    /// use crate::genetic_algo::gen_traits::Population;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// println!("Your fittest individual: {:?}", routes.get_n_fittest(1, &distance_matrix));
     /// ```
-    pub fn get_n_fittest(&self, n: usize, distance_mat: &DistanceMat) -> Vec<Solution> {
+    fn get_n_fittest(&self, n: usize, distance_mat: &DistanceMat) -> Vec<Solution> {
+        //    ) -> Vec<Box<dyn Individual>> {
         let solutions_by_fitness = self.fitnesses(distance_mat);
         argsort(
             &solutions_by_fitness
@@ -136,12 +144,13 @@ impl Routes {
     /// use genetic_algo::routes::Routes;
     /// use genetic_algo::solution::Solution;
     /// use genetic_algo::distance_mat::DistanceMat;
+    /// use crate::genetic_algo::gen_traits::Population;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// let my_fittest_routes = routes.get_fittest_population(2, &distance_matrix);
     /// ```
-    pub fn get_fittest_population(&self, n: usize, distance_mat: &DistanceMat) -> Routes {
+    fn get_fittest_population(&self, n: usize, distance_mat: &DistanceMat) -> Routes {
         Routes::from(self.get_n_fittest(n, distance_mat))
     }
     /// Evolve your population.
@@ -159,13 +168,14 @@ impl Routes {
     /// ```
     /// use genetic_algo::routes::Routes;
     /// use genetic_algo::solution::Solution;
+    /// use crate::genetic_algo::gen_traits::Population;
     /// use genetic_algo::distance_mat::DistanceMat;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
     /// let evolved_routes = routes.evolve(0.5);
     /// ```
-    pub fn evolve(&self, mutate_prob: f32) -> Routes {
+    fn evolve(&self, mutate_prob: f32) -> Routes {
         Routes {
             solutions: self
                 // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
