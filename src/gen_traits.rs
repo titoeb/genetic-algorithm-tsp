@@ -1,10 +1,10 @@
-use crate::solution::Solution;
+use crate::utils::argsort;
 use core::fmt::Debug;
 
 /// Data used for the computation of the costs in genetic algorithms.
 pub trait CostData {
     /// The individual that can deal with this cost data.
-    type Individual;
+    type Individual: Individual;
     /// Compute the costs (reverse fitness) of an individual.
     ///
     /// # Arguments
@@ -18,7 +18,7 @@ pub trait CostData {
 pub trait Individual: Debug + PartialEq + Clone + Eq {
     /// The Type of cost data this individual is compatible to compute its
     /// fitness on.
-    type IndividualCost;
+    type IndividualCost: CostData;
     /// Randomly changes the order of two nodes in the solution
     ///
     /// # Arguments
@@ -46,14 +46,14 @@ pub trait Individual: Debug + PartialEq + Clone + Eq {
     //     cost_data.compute_cost(self)
     // }
 }
+
 /// The container for your current solutions of your problem in a genetic algorithm.
 pub trait Population {
     /// The types your the individuals in your genetic algorithm are that this population is
     /// compatible to.
-    type Individual;
-    /// The object you store additional data in to compute the fitness of individuals. Your
-    /// individuals as well as population need to be compatible in your implementation.
-    type CostData;
+    type Individual: Individual;
+    /// The type of data you use in your Population to generate the iterator.
+    //type IndividualIterData;
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
     /// problem at hand.
     ///
@@ -62,7 +62,14 @@ pub trait Population {
     /// * `distance_mat` - The distances between nodes that is neccessary to computes how well the solution
     /// work in terms of the TSP
     ///
-    fn fitnesses(&self, cost_data: &Self::CostData) -> Vec<(f64, &Self::Individual)>;
+    fn fitnesses(
+        &self,
+        cost_data: &<Self::Individual as Individual>::IndividualCost,
+    ) -> Vec<(f64, &Self::Individual)> {
+        self.iter()
+            .map(|solution| (solution.fitness(cost_data), solution))
+            .collect()
+    }
     /// Get the n fittest individuals in your routes.
     ///
     /// # Arguments
@@ -71,7 +78,23 @@ pub trait Population {
     /// * `cost_data` - The cost data structure your individuals need to compute
     /// their fitness.
     ///
-    fn get_n_fittest(&self, n: usize, cost_data: &Self::CostData) -> Vec<Self::Individual>;
+    fn get_n_fittest(
+        &self,
+        n: usize,
+        cost_data: &<Self::Individual as Individual>::IndividualCost,
+    ) -> Vec<Self::Individual> {
+        let solutions_by_fitness = self.fitnesses(cost_data);
+        argsort(
+            &solutions_by_fitness
+                .iter()
+                .map(|(fitness, _)| *fitness)
+                .collect::<Vec<f64>>(),
+        )
+        .iter()
+        .take(n)
+        .map(|idx| solutions_by_fitness[*idx].1.clone())
+        .collect()
+    }
     /// Get the n fittest individuals in your routes as new routes object. This is typically used
     /// to select the top n inidividuals, before continuing to evolve the routes further.
     ///
@@ -80,7 +103,11 @@ pub trait Population {
     /// * `n` - The number of individuals you would like to have.
     /// * `cost_data` - The cost data structure your indivudals need to compute their fitness.
     ///
-    fn get_fittest_population(&self, n: usize, cost_data: &Self::CostData) -> Self;
+    fn get_fittest_population(
+        &self,
+        n: usize,
+        cost_data: &<Self::Individual as Individual>::IndividualCost,
+    ) -> Self;
     /// Evolve your population.
     ///
     /// The evolution consists of the following stages:
@@ -91,4 +118,25 @@ pub trait Population {
     ///
     /// * `mutate_prob` - The probabilty of an inviduals beeing mutated. Is applied via `individuals.mutate`.
     fn evolve(&self, mutate_prob: f32) -> Self;
+    /// TODO: DOCUMENTATION
+    // TODO: I only use `Vec` here because the type of the iterator is too complicated.
+    // this creates overhead and should be optimized
+    fn evolve_individuals(&self, mutate_prob: f32) -> Vec<Self::Individual> {
+        self
+            // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
+            .iter()
+            .enumerate()
+            .map(|(idx, main_solution)| {
+                self.iter()
+                    // Skip the solution itself, e.g. don't crossover the solution with itself.
+                    .enumerate()
+                    .filter(move |&(solution_index, _)| solution_index != idx)
+                    .map(|(_, solution)| main_solution.crossover(solution).mutate(mutate_prob))
+            })
+            .flatten()
+            .chain(self.iter().cloned())
+            .collect()
+    }
+    /// TODO: DOCUMENTATION
+    fn iter(&self) -> std::collections::hash_set::Iter<Self::Individual>;
 }
