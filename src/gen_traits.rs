@@ -5,13 +5,6 @@ use core::fmt::Debug;
 pub trait CostData {
     /// The individual that can deal with this cost data.
     type Individual: Individual;
-    /// Compute the costs (reverse fitness) of an individual.
-    ///
-    /// # Arguments
-    ///
-    /// * `solution` - The individual that should be tested.
-    ///
-    fn compute_cost(&self, individual: &Self::Individual) -> f64;
 }
 
 /// Individual used in the genetic algorithm.
