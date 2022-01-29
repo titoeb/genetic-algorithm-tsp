@@ -1,5 +1,5 @@
 use crate::distance_mat::DistanceMat;
-use crate::gen_traits::{CostData, Individual};
+use crate::gen_traits::Individual;
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
 use rand::seq::SliceRandom;

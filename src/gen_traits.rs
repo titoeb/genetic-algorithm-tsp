@@ -2,16 +2,12 @@ use crate::utils::argsort;
 use core::fmt::Debug;
 
 /// Data used for the computation of the costs in genetic algorithms.
-pub trait CostData {
-    /// The individual that can deal with this cost data.
-    type Individual: Individual;
-}
 
 /// Individual used in the genetic algorithm.
 pub trait Individual: Debug + PartialEq + Clone + Eq {
     /// The Type of cost data this individual is compatible to compute its
     /// fitness on.
-    type IndividualCost: CostData;
+    type IndividualCost;
     /// Randomly changes the order of two nodes in the solution
     ///
     /// # Arguments

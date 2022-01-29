@@ -1,6 +1,3 @@
-use crate::gen_traits::{CostData, Individual};
-use crate::solution::Solution;
-
 /// A representation of a f64 based distance matrix.
 #[derive(Debug)]
 pub struct DistanceMat {
@@ -53,7 +50,6 @@ impl DistanceMat {
     /// ```
     /// use genetic_algo::distance_mat::DistanceMat;
     /// use genetic_algo::solution::Solution;
-    /// use genetic_algo::gen_traits::CostData;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// println!("{}", distance_matrix.get_distance(&vec![1,0,2]));
@@ -75,9 +71,6 @@ impl DistanceMat {
             )
             .0
     }
-}
-impl CostData for DistanceMat {
-    type Individual = Solution;
 }
 
 #[cfg(test)]
