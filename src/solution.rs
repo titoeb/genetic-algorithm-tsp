@@ -120,7 +120,7 @@ impl Individual for Solution {
     /// ```
     ///
     fn fitness(&self, distance_mat: &DistanceMat) -> f64 {
-        distance_mat.compute_cost(self)
+        distance_mat.get_distance(&self.indexes[..])
     }
 }
 
