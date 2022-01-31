@@ -2,10 +2,10 @@ use crate::utils::argsort;
 use core::fmt::Debug;
 
 /// Individual used in the genetic algorithm.
-pub trait Individual: Debug + PartialEq + Clone + Eq {
+pub trait Individual<'a>: Debug + PartialEq + Clone + Eq {
     /// The Type of cost data this individual is compatible to compute its
     /// fitness on.
-    type IndividualCost;
+    type IndividualCost: 'a;
     /// Randomly changes the order of two nodes in the solution
     ///
     /// # Arguments
@@ -35,10 +35,13 @@ pub trait Individual: Debug + PartialEq + Clone + Eq {
 }
 
 /// The container for your current solutions of your problem in a genetic algorithm.
-pub trait Population {
+pub trait Population<'a> {
     /// The types your the individuals in your genetic algorithm are that this population is
     /// compatible to.
-    type Individual: Individual;
+    type Individual: Individual<'a> + 'a;
+    /// The Iterator you return over your individuals. It depends on the data container you use
+    /// to store individuals in your implementation of `Population`.
+    type IndividualCollection: Iterator<Item = &'a <Self as Population<'a>>::Individual>;
     /// The type of data you use in your Population to generate the iterator.
     //type IndividualIterData;
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
@@ -50,8 +53,8 @@ pub trait Population {
     /// work in terms of the TSP
     ///
     fn fitnesses(
-        &self,
-        cost_data: &<Self::Individual as Individual>::IndividualCost,
+        &'a self,
+        cost_data: &'a <<Self as Population<'a>>::Individual as Individual<'a>>::IndividualCost,
     ) -> Vec<(f64, &Self::Individual)> {
         self.iter()
             .map(|solution| (solution.fitness(cost_data), solution))
@@ -66,9 +69,9 @@ pub trait Population {
     /// their fitness.
     ///
     fn get_n_fittest(
-        &self,
+        &'a self,
         n: usize,
-        cost_data: &<Self::Individual as Individual>::IndividualCost,
+        cost_data: &'a <<Self as Population<'a>>::Individual as Individual<'a>>::IndividualCost,
     ) -> Vec<Self::Individual> {
         let solutions_by_fitness = self.fitnesses(cost_data);
         argsort(
@@ -91,9 +94,9 @@ pub trait Population {
     /// * `cost_data` - The cost data structure your indivudals need to compute their fitness.
     ///
     fn get_fittest_population(
-        &self,
+        &'a self,
         n: usize,
-        cost_data: &<Self::Individual as Individual>::IndividualCost,
+        cost_data: &'a <<Self as Population<'a>>::Individual as Individual<'a>>::IndividualCost,
     ) -> Self;
     /// Evolve your population.
     ///
@@ -108,7 +111,7 @@ pub trait Population {
     /// TODO: DOCUMENTATION
     // TODO: I only use `Vec` here because the type of the iterator is too complicated.
     // this creates overhead and should be optimized
-    fn evolve_individuals(&self, mutate_prob: f32) -> Vec<Self::Individual> {
+    fn evolve_individuals(&'a self, mutate_prob: f32) -> Vec<Self::Individual> {
         self
             // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
             .iter()
@@ -125,5 +128,5 @@ pub trait Population {
             .collect()
     }
     /// Iterate over the individuals in your population.
-    fn iter(&self) -> std::collections::hash_set::Iter<Self::Individual>;
+    fn iter(&'a self) -> Self::IndividualCollection;
 }

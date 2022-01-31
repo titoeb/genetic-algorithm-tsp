@@ -29,7 +29,7 @@ impl Solution {
         Self { indexes }
     }
 }
-impl Individual for Solution {
+impl<'a> Individual<'a> for Solution {
     type IndividualCost = DistanceMat;
     /// Randomly changes the order of two nodes in the solution
     ///
