@@ -145,7 +145,20 @@ impl Population for Routes {
             solutions: HashSet::from_iter(self.evolve_individuals(mutate_prob).into_iter()),
         }
     }
-    /// testing
+    /// Iterate over the individuals of your population.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algo::routes::Routes;
+    /// use genetic_algo::solution::Solution;
+    /// use crate::genetic_algo::gen_traits::Population;
+    ///
+    /// let routes = Routes::from(vec![Solution::new(vec![0,1,2]), Solution::new(vec![1,0,2])]);
+    /// for route in routes.iter(){
+    ///     println!("{:?}", route);
+    /// }
+    /// ```
     fn iter(&self) -> std::collections::hash_set::Iter<Solution> {
         self.solutions.iter()
     }
