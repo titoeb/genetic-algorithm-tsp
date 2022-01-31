@@ -1,8 +1,6 @@
 use crate::utils::argsort;
 use core::fmt::Debug;
 
-/// Data used for the computation of the costs in genetic algorithms.
-
 /// Individual used in the genetic algorithm.
 pub trait Individual: Debug + PartialEq + Clone + Eq {
     /// The Type of cost data this individual is compatible to compute its
@@ -126,6 +124,6 @@ pub trait Population {
             .chain(self.iter().cloned())
             .collect()
     }
-    /// TODO: DOCUMENTATION
+    /// Iterate over the individuals in your population.
     fn iter(&self) -> std::collections::hash_set::Iter<Self::Individual>;
 }
