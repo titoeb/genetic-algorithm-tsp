@@ -4,6 +4,7 @@ use crate::gen_traits::{Individual, Population};
 use crate::solution::Solution;
 use crate::utils::random_permutation;
 use crossbeam_utils::thread;
+use rand::distributions::DistIter;
 use std::collections::HashSet;
 use std::convert::From;
 use std::time::Instant;
@@ -67,8 +68,9 @@ impl Routes {
     }
 }
 
-impl Population for Routes {
+impl<'a> Population<'a> for Routes {
     type Individual = Solution;
+    type IndividualCollection = std::collections::hash_set::Iter<'a, Solution>;
 
     /// Given your pool of current solutions, compute the fitness of your individuals to solve the
     /// problem at hand.
@@ -159,7 +161,7 @@ impl Population for Routes {
     ///     println!("{:?}", route);
     /// }
     /// ```
-    fn iter(&self) -> std::collections::hash_set::Iter<Solution> {
+    fn iter(&'a self) -> std::collections::hash_set::Iter<Solution> {
         self.solutions.iter()
     }
 }
