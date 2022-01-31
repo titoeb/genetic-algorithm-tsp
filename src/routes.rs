@@ -4,7 +4,6 @@ use crate::gen_traits::{Individual, Population};
 use crate::solution::Solution;
 use crate::utils::random_permutation;
 use crossbeam_utils::thread;
-use rand::distributions::DistIter;
 use std::collections::HashSet;
 use std::convert::From;
 use std::time::Instant;
