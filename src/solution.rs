@@ -5,7 +5,7 @@ use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, 
 use rand::seq::SliceRandom;
 use std::cmp::max;
 
-/// The `Solution` is the individual for using generic algorithms to solve Traveling-Salesman-Problems.
+/// The `Solution` is an invidiual in the traveling salemens problem that is a valid route.
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub struct Solution {
     /// The order in which the nodes should be visited.
@@ -30,6 +30,7 @@ impl Solution {
     }
 }
 impl<'a> Individual<'a> for Solution {
+    // The Distance matrix is needed by the individuals to compute their fitness on.
     type IndividualCost = DistanceMat;
     /// Randomly changes the order of two nodes in the solution
     ///
@@ -78,7 +79,7 @@ impl<'a> Individual<'a> for Solution {
     ///
     /// # Arguments
     ///
-    /// * `other` - The other individual you would like to use in the crossover individual.
+    /// * `other` - The other individual you would like to crossover with this individual.
     ///
     /// # Examples
     ///
