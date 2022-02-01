@@ -1,56 +1,55 @@
 use crate::utils::argsort;
 use core::fmt::Debug;
 
-/// Individual used in the genetic algorithm.
-pub trait Individual<'a>: Debug + PartialEq + Clone + Eq {
+/// A single instance in the genetic algorithm.
+/// In a TSP for example, this would be and individual route.
+pub trait Individual<'a>: Debug + PartialEq + Eq + Clone {
     /// The Type of cost data this individual is compatible to compute its
     /// fitness on.
     type IndividualCost: 'a;
-    /// Randomly changes the order of two nodes in the solution
+    /// Randomly change the object and therefore it's fitness
+    /// This is a key step of the genetic algorithm.
     ///
     /// # Arguments
     ///
-    /// * `prob` - The probability with which the indexes will be changed
+    /// * `prob` - The probability with which the individual will mutate.
     fn mutate(self, prob: f32) -> Self;
-    /// Crossover this invidual with another individual to create a new individual. Currently
-    /// uses the `ordered_crossover` algorithm.
+    /// The `crossover` takes two individual and combines their characteristics.
+    /// The implementation depends on the problem to be solve with genetic algorithm but
+    /// both from a performance and runtime perspective, this is one of the most important
+    /// and time-consuming methods.
     ///
     /// # Arguments
     ///
-    /// * `other` - The other individual you would like to use in the crossover individual.
+    /// * `other` - The other individual that should be `crossover`ed with.
     ///
     fn crossover(&self, other: &Self) -> Self;
-    /// Compute how much distance the individual implies with its order of nodes
-    /// and the distance matrix.
+    /// How `fit` is your individual, e.g. how well does it solve the problem you are
+    /// trying to solve with genetic algorithms. This is the metric that is maximised, e.g.
+    /// overall individuals with a very high fitness should be found.
     ///
     /// # Arguments
     ///
-    /// * `distance_matrix` - Distance Matrix that determines the length of the proposed
-    /// solution
+    /// * `cost_data` - The data that might be needed to compute your fitness. If you use
+    /// genetic algorithm to solve a traveling salesman problem, the `cost_data` will typically
+    /// contain your distance matrix.
     ///
     fn fitness(&self, cost_data: &Self::IndividualCost) -> f64;
-    // {
-    //     cost_data.compute_cost(self)
-    // }
 }
 
-/// The container for your current solutions of your problem in a genetic algorithm.
+/// The container for your individuals in a genetic algorithm.
 pub trait Population<'a> {
-    /// The types your the individuals in your genetic algorithm are that this population is
-    /// compatible to.
+    /// The Type of individuals your population should consist of.
     type Individual: Individual<'a> + 'a;
-    /// The Iterator you return over your individuals. It depends on the data container you use
+    /// The iteratore type if you iterate over your individuals. It depends on the data container you use
     /// to store individuals in your implementation of `Population`.
     type IndividualCollection: Iterator<Item = &'a <Self as Population<'a>>::Individual>;
-    /// The type of data you use in your Population to generate the iterator.
-    //type IndividualIterData;
-    /// Given your pool of current solutions, compute the fitness of your individuals to solve the
+    /// Given the pool of current individuals, compute the fitness of your individuals to solve the
     /// problem at hand.
     ///
     /// # Arguments
     ///
-    /// * `distance_mat` - The distances between nodes that is neccessary to computes how well the solution
-    /// work in terms of the TSP
+    /// * `cost_data` - The data neccessary to assess the fitness of an individual.
     ///
     fn fitnesses(
         &'a self,
@@ -60,11 +59,11 @@ pub trait Population<'a> {
             .map(|solution| (solution.fitness(cost_data), solution))
             .collect()
     }
-    /// Get the n fittest individuals in your routes.
+    /// Get the n fittest individuals in your population.
     ///
     /// # Arguments
     ///
-    /// * `n` - The number of individuals you would like to have.
+    /// * `n` - The number of individuals you would like to get
     /// * `cost_data` - The cost data structure your individuals need to compute
     /// their fitness.
     ///
@@ -85,7 +84,7 @@ pub trait Population<'a> {
         .map(|idx| solutions_by_fitness[*idx].1.clone())
         .collect()
     }
-    /// Get the n fittest individuals in your routes as new routes object. This is typically used
+    /// Get the n fittest individuals in your population as population routes object. This is typically used
     /// to select the top n inidividuals, before continuing to evolve the routes further.
     ///
     /// # Arguments
@@ -101,14 +100,31 @@ pub trait Population<'a> {
     /// Evolve your population.
     ///
     /// The evolution consists of the following stages:
-    /// 1) `crossover` between all 1,...,n solutions excluding the solution itself.
+    /// 1) `crossover` between all 1,...,n indivials. Each individual will not be `crossover`ed
+    /// with itself, but as the crossover is not neccessarily symmetric `indivdual_a.crossover(indivual_b)` as well
+    /// as `individual_b.crossover(individual_a)` will be computed.
     /// 2) `mutate` is applied to all individuals.
+    ///
+    /// The difference to the `evolve_individuals` function is that this needs to be implemented in the struct
+    /// that implements this trait because how the population is constructed depends on the representation you
+    /// choose to use. Please use the `evolve_individuals`-function to get the updated inviduals. You could use an
+    /// iterator or implement the `From<Vec<Individuals>>`-trait.
     ///
     /// # Arguments
     ///
     /// * `mutate_prob` - The probabilty of an inviduals beeing mutated. Is applied via `individuals.mutate`.
     fn evolve(&self, mutate_prob: f32) -> Self;
-    /// TODO: DOCUMENTATION
+    /// Evolve your population.
+    ///
+    /// The evolution consists of the following stages:
+    /// 1) `crossover` between all 1,...,n indivials. Each individual will not be `crossover`ed
+    /// with itself, but as the crossover is not neccessarily symmetric `indivdual_a.crossover(indivual_b)` as well
+    /// as `individual_b.crossover(individual_a)` will be computed.
+    /// 2) `mutate` is applied to all individuals.
+    ///
+    /// # Arguments
+    ///
+    /// * `mutate_prob` - The probabilty of an inviduals beeing mutated. Is applied via `individuals.mutate`.
     // TODO: I only use `Vec` here because the type of the iterator is too complicated.
     // this creates overhead and should be optimized
     fn evolve_individuals(&'a self, mutate_prob: f32) -> Vec<Self::Individual> {
