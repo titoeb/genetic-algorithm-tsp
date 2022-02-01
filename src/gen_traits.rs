@@ -1,9 +1,8 @@
 use crate::utils::argsort;
-use core::fmt::Debug;
 
 /// A single instance in the genetic algorithm.
 /// In a TSP for example, this would be and individual route.
-pub trait Individual<'a>: Debug + PartialEq + Eq + Clone {
+pub trait Individual<'a>: Clone {
     /// The Type of cost data this individual is compatible to compute its
     /// fitness on.
     type IndividualCost: 'a;
