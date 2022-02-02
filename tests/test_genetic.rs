@@ -8,7 +8,7 @@ use std::fs;
 fn run_evolution() {
     let n_generations = 10;
     let size_generation = 20;
-    // End-to-end test: does the error of the solution get down?
+    // End-to-end test: does the error of the route get down?
     let distances = DistanceMat::new(
         fs::read_to_string("tests/test-data/distances.txt")
             .unwrap()

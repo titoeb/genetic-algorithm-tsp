@@ -37,19 +37,19 @@ impl DistanceMat {
     pub fn n_units(&self) -> usize {
         self.distances.len()
     }
-    /// Given a sequence of nodes (in a `Solution`-object) compute the distance for the round-
+    /// Given a sequence of nodes (in a `Route`-object) compute the distance for the round-
     /// trip between node 0..0
     ///
     /// # Arguments
     ///
-    /// * `solution` - The sequence of nodes that is visited and for which the round-trip-lenght
+    /// * `route` - The sequence of nodes that is visited and for which the round-trip-lenght
     /// should be computed.
     ///
     /// # Examples
     ///
     /// ```
     /// use genetic_algo::distance_mat::DistanceMat;
-    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::route::Route;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// println!("{}", distance_matrix.get_distance(&vec![1,0,2]));
