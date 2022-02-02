@@ -71,16 +71,16 @@ pub trait Population<'a> {
         n: usize,
         cost_data: &'a <<Self as Population<'a>>::Individual as Individual<'a>>::IndividualCost,
     ) -> Vec<Self::Individual> {
-        let solutions_by_fitness = self.fitnesses(cost_data);
+        let individuals_by_fitness = self.fitnesses(cost_data);
         argsort(
-            &solutions_by_fitness
+            &individuals_by_fitness
                 .iter()
                 .map(|(fitness, _)| *fitness)
                 .collect::<Vec<f64>>(),
         )
         .iter()
         .take(n)
-        .map(|idx| solutions_by_fitness[*idx].1.clone())
+        .map(|idx| individuals_by_fitness[*idx].1.clone())
         .collect()
     }
     /// Get the n fittest individuals in your population as population routes object. This is typically used
@@ -128,15 +128,17 @@ pub trait Population<'a> {
     // this creates overhead and should be optimized
     fn evolve_individuals(&'a self, mutate_prob: f32) -> Vec<Self::Individual> {
         self
-            // for all solutions 1 .. n crossover with all other solutions excluding the same solution.
+            // for all individuals 1 .. n crossover with all other individuals excluding the same individual.
             .iter()
             .enumerate()
-            .map(|(idx, main_solution)| {
+            .map(|(idx, main_individual)| {
                 self.iter()
-                    // Skip the solution itself, e.g. don't crossover the solution with itself.
+                    // Skip the individual itself, e.g. don't crossover the individual with itself.
                     .enumerate()
-                    .filter(move |&(solution_index, _)| solution_index != idx)
-                    .map(|(_, solution)| main_solution.crossover(solution).mutate(mutate_prob))
+                    .filter(move |&(individual_index, _)| individual_index != idx)
+                    .map(|(_, individual)| {
+                        main_individual.crossover(individual).mutate(mutate_prob)
+                    })
             })
             .flatten()
             .chain(self.iter().cloned())
