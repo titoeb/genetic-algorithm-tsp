@@ -309,8 +309,8 @@ mod tests {
         assert_eq!(fitnesses.len(), 2);
 
         for element in vec![
-            (6.0, &Solution::new(vec![1, 2, 0])),
-            (2.0, &Solution::new(vec![1, 0])),
+            (-6.0, &Solution::new(vec![1, 2, 0])),
+            (-2.0, &Solution::new(vec![1, 0])),
         ] {
             assert!(fitnesses.contains(&element))
         }
