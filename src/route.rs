@@ -5,14 +5,14 @@ use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, 
 use rand::seq::SliceRandom;
 use std::cmp::max;
 
-/// The `Solution` is an invidiual in the traveling salemens problem that is a valid route.
+/// The `Route` is an invidiual in the traveling salemens problem that is a valid route.
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
-pub struct Solution {
+pub struct Route {
     /// The order in which the nodes should be visited.
     pub indexes: Vec<usize>,
 }
-impl Solution {
-    /// Create a new solution based on a vector of indexes.
+impl Route {
+    /// Create a new route based on a vector of indexes.
     ///
     /// # Arguments
     ///
@@ -21,18 +21,18 @@ impl Solution {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::route::Route;
     ///
-    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// ```
     pub fn new(indexes: Vec<usize>) -> Self {
         Self { indexes }
     }
 }
-impl<'a> Individual<'a> for Solution {
+impl<'a> Individual<'a> for Route {
     // The Distance matrix is needed by the individuals to compute their fitness on.
     type IndividualCost = DistanceMat;
-    /// Randomly changes the order of two nodes in the solution
+    /// Randomly changes the order of two nodes in the route
     ///
     /// # Arguments
     ///
@@ -41,14 +41,14 @@ impl<'a> Individual<'a> for Solution {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::route::Route;
     /// use genetic_algo::gen_traits::Individual;
     ///
-    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// let my_mutated_indiviual =  my_individual.mutate(1.0);
     /// ```
     fn mutate(self, prob: f32) -> Self {
-        Solution {
+        Route {
             indexes: if get_random_elem_from_range(0.0..1.0) > prob {
                 // With probabilty (1-prop) don't do any mutation.
                 self.indexes
@@ -84,15 +84,15 @@ impl<'a> Individual<'a> for Solution {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::route::Route;
     /// use genetic_algo::gen_traits::Individual;
     ///
-    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// let my_individual = my_individual.crossover(
-    ///     &Solution::from(Solution::new(vec![1,0,2]))
+    ///     &Route::from(Route::new(vec![1,0,2]))
     /// );
     /// ```
-    fn crossover(&self, other: &Solution) -> Self {
+    fn crossover(&self, other: &Route) -> Self {
         ordered_crossover(
             self,
             other,
@@ -105,16 +105,16 @@ impl<'a> Individual<'a> for Solution {
     /// # Arguments
     ///
     /// * `distance_matrix` - Distance Matrix that determines the length of the proposed
-    /// solution
+    /// route
     ///
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::solution::Solution;
+    /// use genetic_algo::route::Route;
     /// use genetic_algo::distance_mat::DistanceMat;
     /// use genetic_algo::gen_traits::Individual;
     ///
-    /// let my_individual = Solution::from(Solution::new(vec![0,1,2]));
+    /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// println!("Fitness of your individual: {}", my_individual.fitness(
     ///     &DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]))
     /// )
@@ -128,18 +128,18 @@ impl<'a> Individual<'a> for Solution {
 #[cfg(test)]
 mod tests {
     use super::*;
-    mod test_solution {
+    mod test_route {
         use super::*;
         use crate::test_utils::valid_permutation;
         #[test]
         fn test_constructor() {
-            let solution = Solution::new(vec![1, 2, 3, 4]);
-            assert_eq!(solution.indexes, vec![1, 2, 3, 4])
+            let route = Route::new(vec![1, 2, 3, 4]);
+            assert_eq!(route.indexes, vec![1, 2, 3, 4])
         }
         #[test]
         fn test_mutuate_no_prob() {
             assert_eq!(
-                Solution::new(vec![1, 2, 3, 4]).mutate(0.0).indexes,
+                Route::new(vec![1, 2, 3, 4]).mutate(0.0).indexes,
                 vec![1, 2, 3, 4]
             )
         }
@@ -151,24 +151,18 @@ mod tests {
         #[test]
         fn test_mutuate_100_prob() {
             assert_ne!(
-                Solution::new(vec![1, 2, 3, 4]).mutate(1.0).indexes,
+                Route::new(vec![1, 2, 3, 4]).mutate(1.0).indexes,
                 vec![1, 2, 3, 4]
             )
         }
         #[test]
         fn test_mutuate_100_prob_3_elems() {
-            assert_ne!(
-                Solution::new(vec![1, 2, 3]).mutate(1.0).indexes,
-                vec![1, 2, 3]
-            )
+            assert_ne!(Route::new(vec![1, 2, 3]).mutate(1.0).indexes, vec![1, 2, 3])
         }
         #[test]
         fn test_mutate_simple_run() {
-            let test_solution = Solution::new(vec![1, 2, 0]);
-            valid_permutation(
-                &test_solution.indexes,
-                &test_solution.clone().mutate(0.5).indexes,
-            );
+            let test_route = Route::new(vec![1, 2, 0]);
+            valid_permutation(&test_route.indexes, &test_route.clone().mutate(0.5).indexes);
         }
     }
     mod test_crossover {
@@ -178,20 +172,20 @@ mod tests {
         #[test]
         fn random_test_10() {
             let n_tests = 1000;
-            let solution_a = Solution {
+            let route_a = Route {
                 indexes: vec![0, 12, 7, 3, 9, 8, 11, 5, 13, 1, 4, 6, 10, 15, 2, 14],
             };
-            let solution_b = Solution {
+            let route_b = Route {
                 indexes: vec![7, 10, 15, 12, 2, 9, 5, 3, 1, 6, 4, 13, 14, 11, 8, 0],
             };
             let mut n_no_crossover = 0;
             for _ in 1..n_tests {
-                let result = solution_a.crossover(&solution_b);
-                if result.indexes == solution_a.indexes || result.indexes == solution_b.indexes {
+                let result = route_a.crossover(&route_b);
+                if result.indexes == route_a.indexes || result.indexes == route_b.indexes {
                     n_no_crossover += 1;
                 }
-                valid_permutation(&result.indexes, &solution_a.indexes);
-                valid_permutation(&result.indexes, &solution_a.indexes);
+                valid_permutation(&result.indexes, &route_a.indexes);
+                valid_permutation(&result.indexes, &route_a.indexes);
             }
             assert!(n_no_crossover <= n_tests / 5);
         }
@@ -202,8 +196,8 @@ mod tests {
         #[test]
         fn simple_functionality_test() {
             let distance_mat = test_dist_mat();
-            let solution = Solution::new(vec![1, 2, 0]);
-            assert_eq!(solution.fitness(&distance_mat), -6.0);
+            let route = Route::new(vec![1, 2, 0]);
+            assert_eq!(route.fitness(&distance_mat), -6.0);
         }
     }
 }

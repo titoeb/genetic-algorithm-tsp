@@ -8,12 +8,12 @@
 pub mod distance_mat;
 /// Traits used for abstraction of gen-algo
 pub mod gen_traits;
-/// The `routes`-module contains the main class of this crate which is the `Routes`-class that contains
-/// your current subset of solutions and with which you can evolve them.
-pub mod routes;
-/// The `solution`-module contains the `Solution`-class, the individual element of the TSP that implements
+/// The `route`-module contains the `Route`-class, the individual element of the TSP that implements
 /// important methods like `crossover` or `mutate`.
-pub mod solution;
+pub mod route;
+/// The `routes`-module contains the main class of this crate which is the `Routes`-class that contains
+/// your current subset of routes and with which you can evolve them.
+pub mod routes;
 /// The `subsequence`-module contains a helper function, `Subsequence` that gives you functionality to select elements
 /// before, in and after a subsequence of a Vector. It is used extensively in the `ordered_crossover`-function.
 mod subsequence;

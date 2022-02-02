@@ -1,4 +1,4 @@
-use crate::solution::Solution;
+use crate::route::Route;
 use crate::subsequence::Subsequence;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
@@ -64,11 +64,7 @@ pub fn remove_elem(mut data: Vec<usize>, elem_idx: usize) -> Vec<usize> {
 /// * `parent_b` - The second parent in which the subsequence is inputed.
 /// * `subsequence` - The actual subsequence that is taken.
 ///
-pub fn ordered_crossover(
-    parent_a: &Solution,
-    parent_b: &Solution,
-    subsequence: Subsequence,
-) -> Solution {
+pub fn ordered_crossover(parent_a: &Route, parent_b: &Route, subsequence: Subsequence) -> Route {
     let mut child: Vec<usize> = Vec::new();
     let mapped_selection = subsequence.get_values_in(&parent_a.indexes).unwrap();
     // First push elements in subsequence of receiver, that are not in subsequence of donor.
@@ -93,7 +89,7 @@ pub fn ordered_crossover(
             child.push(*elem);
         }
     }
-    Solution { indexes: child }
+    Route { indexes: child }
 }
 /// Does a sequence contain a certain value?
 ///
@@ -262,10 +258,10 @@ mod tests {
             // test taken from example in https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.1898&rep=rep1&type=pdf.
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![9, 8, 4, 5, 6, 7, 1, 3, 2]
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![8, 7, 1, 2, 3, 0, 9, 5, 4]
                     },
                     Subsequence {
@@ -281,10 +277,10 @@ mod tests {
         fn simple_test() {
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![3, 2, 0, 1]
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![1, 2, 3, 0]
                     },
                     Subsequence {
@@ -300,10 +296,10 @@ mod tests {
         fn only_a() {
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![3, 2, 0, 1]
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![1, 2, 3, 0]
                     },
                     Subsequence {
@@ -319,10 +315,10 @@ mod tests {
         fn only_b() {
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![3, 2, 0, 1]
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![1, 2, 3, 0]
                     },
                     Subsequence {
@@ -340,10 +336,10 @@ mod tests {
             // https://www.rubicite.com/Tutorials/GeneticAlgorithms/CrossoverOperators/Order1CrossoverOperator.aspx
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![8, 4, 7, 3, 6, 2, 5, 1, 9, 0]
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                     },
                     Subsequence {
@@ -359,10 +355,10 @@ mod tests {
         fn larger_examples() {
             assert_eq!(
                 ordered_crossover(
-                    &Solution {
+                    &Route {
                         indexes: vec![0, 12, 7, 3, 9, 8, 11, 5, 13, 1, 4, 6, 10, 15, 2, 14],
                     },
-                    &Solution {
+                    &Route {
                         indexes: vec![7, 10, 15, 12, 2, 9, 5, 3, 1, 6, 4, 13, 14, 11, 8, 0],
                     },
                     Subsequence {
