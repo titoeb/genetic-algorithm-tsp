@@ -121,7 +121,7 @@ impl<'a> Individual<'a> for Solution {
     /// ```
     ///
     fn fitness(&self, distance_mat: &DistanceMat) -> f64 {
-        distance_mat.get_distance(&self.indexes[..])
+        -distance_mat.get_distance(&self.indexes[..])
     }
 }
 
@@ -203,7 +203,7 @@ mod tests {
         fn simple_functionality_test() {
             let distance_mat = test_dist_mat();
             let solution = Solution::new(vec![1, 2, 0]);
-            assert_eq!(solution.fitness(&distance_mat), 6.0);
+            assert_eq!(solution.fitness(&distance_mat), -6.0);
         }
     }
 }

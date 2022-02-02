@@ -27,5 +27,5 @@ fn run_evolution() {
     let routes = evolve_population(routes, n_generations, size_generation, &distances, 0);
     let max_fit_new = routes.get_n_fittest(1, &distances)[0].fitness(&distances);
     // Assert after optimizing, the routes is fitter then before.
-    assert!(max_fit > max_fit_new);
+    assert!(max_fit <= max_fit_new);
 }
