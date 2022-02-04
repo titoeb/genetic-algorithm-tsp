@@ -1,5 +1,5 @@
-use genetic_algo::distance_mat::DistanceMat;
-use genetic_algo::routes::benchmark_population;
+use genetic_algorithm_tsp::distance_mat::DistanceMat;
+use genetic_algorithm_tsp::routes::benchmark_population;
 use std::fs;
 
 fn main() {

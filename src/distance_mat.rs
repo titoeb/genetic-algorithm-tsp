@@ -17,7 +17,7 @@ impl DistanceMat {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// ```
@@ -29,7 +29,7 @@ impl DistanceMat {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// println!("{}", distance_matrix.n_units());
@@ -48,8 +48,8 @@ impl DistanceMat {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::distance_mat::DistanceMat;
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::route::Route;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// println!("{}", distance_matrix.get_distance(&vec![1,0,2]));

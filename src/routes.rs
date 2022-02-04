@@ -27,8 +27,8 @@ impl From<Vec<Route>> for Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
     ///
     /// let routes = Routes::from(vec![Route::new(vec![0,1,2]), Route::new(vec![1,0,2])]);
     /// ```
@@ -50,8 +50,8 @@ impl Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
     ///
     /// let routes = Routes::from(vec![Route::new(vec![0,1,2]), Route::new(vec![1,0,2])]);
     /// ```
@@ -82,9 +82,9 @@ impl<'a> Population<'a> for Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     /// use genetic_algorithm_traits::Population;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
@@ -107,9 +107,9 @@ impl<'a> Population<'a> for Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     /// use genetic_algorithm_traits::Population;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
@@ -132,10 +132,10 @@ impl<'a> Population<'a> for Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
     /// use genetic_algorithm_traits::Population;
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     ///
     /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
     /// let routes = Routes::from(vec![Route::new(vec![0,1,2]), Route::new(vec![1,0,2])]);
@@ -151,8 +151,8 @@ impl<'a> Population<'a> for Routes {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::routes::Routes;
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
     /// use genetic_algorithm_traits::Population;
     ///
     /// let routes = Routes::from(vec![Route::new(vec![0,1,2]), Route::new(vec![1,0,2])]);
@@ -178,9 +178,9 @@ impl<'a> Population<'a> for Routes {
 /// # Examples
 ///
 /// ```
-/// use genetic_algo::routes::{Routes, evolve_population};
-/// use genetic_algo::route::Route;
-/// use genetic_algo::distance_mat::DistanceMat;
+/// use genetic_algorithm_tsp::routes::{Routes, evolve_population};
+/// use genetic_algorithm_tsp::route::Route;
+/// use genetic_algorithm_tsp::distance_mat::DistanceMat;
 ///
 /// let evolved_population = evolve_population(
 ///     Routes::from(vec![Route::new(vec![0,1,2]), Route::new(vec![1,0,2])]),
