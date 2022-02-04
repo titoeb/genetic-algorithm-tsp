@@ -1,7 +1,7 @@
-use genetic_algo::distance_mat::DistanceMat;
-use genetic_algo::routes::{evolve_population, Routes};
 use genetic_algorithm_traits::Individual;
 use genetic_algorithm_traits::Population;
+use genetic_algorithm_tsp::distance_mat::DistanceMat;
+use genetic_algorithm_tsp::routes::{evolve_population, Routes};
 use std::fs;
 
 #[test]
