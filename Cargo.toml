@@ -1,9 +1,12 @@
 [package]
-name = "genetic_algo"
+name = "genetic-algorithm-tsp"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Tim Toebrock"]
+license = "MIT"
+description = """
+Using genetic algorithms to solve Traveling salesman problems.
+"""
 
 [dependencies]
 crossbeam-utils = "0.8.6"
