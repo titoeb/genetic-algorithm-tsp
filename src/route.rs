@@ -21,7 +21,7 @@ impl Route {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::route::Route;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// ```
@@ -41,7 +41,7 @@ impl<'a> Individual<'a> for Route {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::route::Route;
     /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
@@ -84,7 +84,7 @@ impl<'a> Individual<'a> for Route {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::route::Route;
+    /// use genetic_algorithm_tsp::route::Route;
     /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
@@ -110,8 +110,8 @@ impl<'a> Individual<'a> for Route {
     /// # Examples
     ///
     /// ```
-    /// use genetic_algo::route::Route;
-    /// use genetic_algo::distance_mat::DistanceMat;
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
     /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
