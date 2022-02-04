@@ -6,8 +6,6 @@
 
 /// Represent a distance Matrix as a Vec<Vec<f64>>.
 pub mod distance_mat;
-/// Traits used for abstraction of gen-algo
-pub mod gen_traits;
 /// The `route`-module contains the `Route`-class, the individual element of the TSP that implements
 /// important methods like `crossover` or `mutate`.
 pub mod route;
