@@ -1,7 +1,7 @@
 use crate::distance_mat::DistanceMat;
-use crate::gen_traits::Individual;
 use crate::subsequence::Subsequence;
 use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, remove_elem};
+use genetic_algorithm_traits::Individual;
 use rand::seq::SliceRandom;
 use std::cmp::max;
 
@@ -42,7 +42,7 @@ impl<'a> Individual<'a> for Route {
     ///
     /// ```
     /// use genetic_algo::route::Route;
-    /// use genetic_algo::gen_traits::Individual;
+    /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// let my_mutated_indiviual =  my_individual.mutate(1.0);
@@ -85,7 +85,7 @@ impl<'a> Individual<'a> for Route {
     ///
     /// ```
     /// use genetic_algo::route::Route;
-    /// use genetic_algo::gen_traits::Individual;
+    /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// let my_individual = my_individual.crossover(
@@ -112,7 +112,7 @@ impl<'a> Individual<'a> for Route {
     /// ```
     /// use genetic_algo::route::Route;
     /// use genetic_algo::distance_mat::DistanceMat;
-    /// use genetic_algo::gen_traits::Individual;
+    /// use  genetic_algorithm_traits::Individual;
     ///
     /// let my_individual = Route::from(Route::new(vec![0,1,2]));
     /// println!("Fitness of your individual: {}", my_individual.fitness(
