@@ -65,6 +65,16 @@ impl Routes {
 
         Routes { routes }
     }
+    /// TODO
+    pub fn add_vec_route(self, routes: Vec<Route>) -> Self {
+        Routes::from(
+            self.routes
+                .iter()
+                .chain(routes.to_owned().iter())
+                .map(|route| route.clone())
+                .collect::<Vec<Route>>(),
+        )
+    }
 }
 
 impl<'a> Population<'a> for Routes {
@@ -297,6 +307,25 @@ mod tests {
         for route in population.routes {
             valid_permutation(&route.indexes, &(0..n_objects).collect::<Vec<usize>>());
         }
+    }
+    #[test]
+    fn test_add_vec_routes() {
+        let current_routes = Routes::from(vec![Route::new(vec![1]), Route::new(vec![2])]);
+        let extended_routes =
+            current_routes.add_vec_route(vec![Route::new(vec![3]), Route::new(vec![4])]);
+
+        valid_permutation(
+            &vec![
+                Route::new(vec![1]),
+                Route::new(vec![2]),
+                Route::new(vec![3]),
+                Route::new(vec![4]),
+            ],
+            &extended_routes
+                .iter()
+                .map(|route| route.clone())
+                .collect::<Vec<Route>>(),
+        )
     }
     #[test]
     fn test_fitness() {
