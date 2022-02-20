@@ -4,12 +4,21 @@ use crate::utils::{change_order, get_random_elem_from_range, ordered_crossover, 
 use genetic_algorithm_traits::Individual;
 use rand::seq::SliceRandom;
 use std::cmp::max;
+use std::fmt;
 
 /// The `Route` is an invidiual in the traveling salemens problem that is a valid route.
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub struct Route {
     /// The order in which the nodes should be visited.
     pub indexes: Vec<usize>,
+}
+/// Make Route formattable.
+impl fmt::Display for Route {
+    /// As a string representation of the Route, just display the inidividual
+    /// nodes that are visited.
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "Route({:?})", self.indexes)
+    }
 }
 impl Route {
     /// Create a new route based on a vector of indexes.
@@ -131,6 +140,12 @@ mod tests {
     mod test_route {
         use super::*;
         use crate::test_utils::valid_permutation;
+        #[test]
+        fn test_format() {
+            let route_to_print = Route::new(vec![1, 2, 3, 4]);
+            assert_eq!(format!("{}", route_to_print), "Route([1, 2, 3, 4])");
+        }
+
         #[test]
         fn test_constructor() {
             let route = Route::new(vec![1, 2, 3, 4]);
