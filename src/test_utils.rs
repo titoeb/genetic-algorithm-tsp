@@ -1,4 +1,5 @@
 use crate::distance_mat::DistanceMat;
+use core::hash;
 use std::collections::HashSet;
 
 /// Get the test matrix that should be use tests.
@@ -23,7 +24,10 @@ pub fn test_dist_mat() -> DistanceMat {
 /// * `sequence` - The actual sequence
 /// * `permutation` - The potential permutation of the original sequence that should be tested.
 ///
-pub fn valid_permutation(sequence: &[usize], permutation: &[usize]) {
+pub fn valid_permutation<T>(sequence: &[T], permutation: &[T])
+where
+    T: Clone + Eq + hash::Hash,
+{
     // If ..
     // - the two sequences have the same length
     // - sequence is a superset of permutation
@@ -33,13 +37,13 @@ pub fn valid_permutation(sequence: &[usize], permutation: &[usize]) {
     assert!(sequence
         .iter()
         .cloned()
-        .collect::<HashSet<usize>>()
-        .is_superset(&permutation.iter().cloned().collect::<HashSet<usize>>()));
+        .collect::<HashSet<T>>()
+        .is_superset(&permutation.iter().cloned().collect::<HashSet<T>>()));
     assert!(permutation
         .iter()
         .cloned()
-        .collect::<HashSet<usize>>()
-        .is_superset(&sequence.iter().cloned().collect::<HashSet<usize>>()));
+        .collect::<HashSet<T>>()
+        .is_superset(&sequence.iter().cloned().collect::<HashSet<T>>()));
 }
 
 #[cfg(test)]
