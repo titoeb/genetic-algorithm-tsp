@@ -126,6 +126,26 @@ impl Routes {
                 .collect::<Vec<Route>>(),
         )
     }
+    /// Get the number of nodes for the `Route`'s in this `Routes`-object.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    ///
+    /// let routes_with_three_nodes = Routes::from(vec![Route::new(vec![1,2,3,]), Route::new(vec![4,5,6])]);
+    /// println!("The route have {} nodes", routes_with_three_nodes.get_n_nodes());
+    /// ```
+    pub fn get_n_nodes(&self) -> usize {
+        *self
+            .iter()
+            .take(1)
+            .map(|node| node.get_n_nodes())
+            .collect::<Vec<usize>>()
+            .first()
+            .unwrap()
+    }
 }
 
 impl<'a> Population<'a> for Routes {
@@ -399,6 +419,12 @@ mod tests {
                 .map(|route| route.clone())
                 .collect::<Vec<Route>>(),
         )
+    }
+    #[test]
+    fn test_get_n_nodes() {
+        let routes_with_three_nodes =
+            Routes::from(vec![Route::new(vec![1, 2, 3]), Route::new(vec![4, 5, 6])]);
+        assert_eq!(routes_with_three_nodes.get_n_nodes(), 3);
     }
     #[test]
     fn test_fitness() {
