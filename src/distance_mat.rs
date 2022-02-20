@@ -1,3 +1,4 @@
+use crate::routes;
 /// A representation of a f64 based distance matrix.
 #[derive(Debug)]
 pub struct DistanceMat {
@@ -71,6 +72,24 @@ impl DistanceMat {
             )
             .0
     }
+
+    /// Generate a random population suiting your distance mat.  
+    ///
+    /// # Arguments
+    ///
+    /// * `n_routes` - How many routes should be generated?
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::distance_mat::DistanceMat;
+    ///
+    /// let distance_matrix = DistanceMat::new(vec![vec![0.0,1.0,2.0], vec![1.0,0.0,3.0], vec![2.0,3.0,0.0]]);
+    /// println!("{}", distance_matrix.get_random_population(5));
+    /// ```
+    pub fn get_random_population(&self, n_routes: usize) -> routes::Routes {
+        routes::Routes::random(n_routes, self.n_units())
+    }
 }
 
 #[cfg(test)]
@@ -100,5 +119,14 @@ mod test_distance_mat {
     #[test]
     fn test_dist_repeat_visit() {
         assert_eq!(test_dist_mat().get_distance(&[0, 2, 1, 2]), 10.0);
+    }
+    #[test]
+    fn test_get_random_population() {
+        let distance_matrix = DistanceMat::new(vec![
+            vec![0.0, 1.0, 2.0],
+            vec![1.0, 0.0, 3.0],
+            vec![2.0, 3.0, 0.0],
+        ]);
+        distance_matrix.get_random_population(5);
     }
 }
