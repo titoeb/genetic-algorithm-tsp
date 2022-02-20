@@ -97,8 +97,8 @@ impl Routes {
         Routes::from(
             self.routes
                 .iter()
-                .chain(routes.to_owned().iter())
-                .map(|route| route.clone())
+                .chain(routes.iter())
+                .cloned()
                 .collect::<Vec<Route>>(),
         )
     }
@@ -119,12 +119,45 @@ impl Routes {
     /// println!("{}", current_routes.combine_routes(other_routes));
     /// ```
     pub fn combine_routes(self, other_routes: Routes) -> Self {
-        self.add_vec_route(
-            other_routes
-                .iter()
-                .map(|route| route.clone())
-                .collect::<Vec<Route>>(),
-        )
+        self.add_vec_route(other_routes.iter().cloned().collect::<Vec<Route>>())
+    }
+    /// Get the number of nodes for the `Route`'s in this `Routes`-object.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    ///
+    /// let routes_with_three_nodes = Routes::from(vec![Route::new(vec![1,2,3,]), Route::new(vec![4,5,6])]);
+    /// println!("The route have {} nodes", routes_with_three_nodes.get_n_nodes());
+    /// ```
+    pub fn get_n_nodes(&self) -> usize {
+        *self
+            .iter()
+            .take(1)
+            .map(|node| node.get_n_nodes())
+            .collect::<Vec<usize>>()
+            .first()
+            .unwrap()
+    }
+    /// Add n random nodes to your current pool.
+    ///
+    /// # Arguments:
+    ///
+    /// `n_random_nodes`: The number of random nodes that should be added.
+    ///
+    /// # Examples
+    /// ```
+    /// use genetic_algorithm_tsp::route::Route;
+    /// use genetic_algorithm_tsp::routes::Routes;
+    ///
+    /// let a_single_route = Routes::from(vec![Route::new(vec![0,1,2])]);
+    /// println!("{}", a_single_route.add_n_random_nodes(1));
+    /// ```
+    pub fn add_n_random_nodes(self, n_random_nodes: usize) -> Self {
+        let number_of_nodes = self.get_n_nodes();
+        self.combine_routes(Routes::random(n_random_nodes, number_of_nodes))
     }
 }
 
@@ -399,6 +432,20 @@ mod tests {
                 .map(|route| route.clone())
                 .collect::<Vec<Route>>(),
         )
+    }
+    #[test]
+    fn test_get_n_nodes() {
+        let routes_with_three_nodes =
+            Routes::from(vec![Route::new(vec![1, 2, 3]), Route::new(vec![4, 5, 6])]);
+        assert_eq!(routes_with_three_nodes.get_n_nodes(), 3);
+    }
+    #[test]
+    fn add_n_random_nodes() {
+        // Because there are only 6 possible routes with three nodes,
+        // when I add 6, there have to be 6 in total (e.g. five new ones
+        // were added).
+        let a_single_route = Routes::from(vec![Route::new(vec![0, 1, 2])]);
+        assert_eq!(a_single_route.add_n_random_nodes(6).iter().len(), 6);
     }
     #[test]
     fn test_fitness() {
