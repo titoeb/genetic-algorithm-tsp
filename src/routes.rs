@@ -97,8 +97,8 @@ impl Routes {
         Routes::from(
             self.routes
                 .iter()
-                .chain(routes.to_owned().iter())
-                .map(|route| route.clone())
+                .chain(routes.iter())
+                .cloned()
                 .collect::<Vec<Route>>(),
         )
     }
@@ -119,12 +119,7 @@ impl Routes {
     /// println!("{}", current_routes.combine_routes(other_routes));
     /// ```
     pub fn combine_routes(self, other_routes: Routes) -> Self {
-        self.add_vec_route(
-            other_routes
-                .iter()
-                .map(|route| route.clone())
-                .collect::<Vec<Route>>(),
-        )
+        self.add_vec_route(other_routes.iter().cloned().collect::<Vec<Route>>())
     }
     /// Get the number of nodes for the `Route`'s in this `Routes`-object.
     ///
