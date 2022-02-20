@@ -6,6 +6,7 @@ use crate::utils::random_permutation;
 use crossbeam_utils::thread;
 use std::collections::HashSet;
 use std::convert::From;
+use std::fmt;
 use std::time::Instant;
 
 /// The `Population` is your current pools of routes that you would to improve by evolving them.
@@ -14,6 +15,18 @@ pub struct Routes {
     /// An individual routes is made from `routes`, e.g. individuals that might your given problem
     /// better of worse.
     routes: HashSet<Route>,
+}
+impl fmt::Display for Routes {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            formatter,
+            "Routes([{}\n])",
+            self.iter()
+                .map(|route| format!("{}", route))
+                .collect::<Vec<String>>()
+                .join("\n\t")
+        )
+    }
 }
 // Convert a Vector of solutioons to a routes.
 impl From<Vec<Route>> for Routes {
@@ -276,7 +289,11 @@ pub fn benchmark_population(
 mod tests {
     use super::*;
     use crate::test_utils::{test_dist_mat, valid_permutation};
-
+    #[test]
+    fn test_format() {
+        let route_to_print = Routes::from(vec![Route::new(vec![1, 2])]);
+        assert_eq!(format!("{}", route_to_print), "Routes([Route([1, 2])\n])");
+    }
     #[test]
     fn from_routes_vector() {
         assert_eq!(
