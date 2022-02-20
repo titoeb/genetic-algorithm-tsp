@@ -37,6 +37,19 @@ impl Route {
     pub fn new(indexes: Vec<usize>) -> Self {
         Self { indexes }
     }
+    /// Get the number of nodes for this route.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::route::Route;
+    ///
+    /// let three_node_route = Route::from(Route::new(vec![0,1,2]));
+    /// println!("This route has {} nodes", three_node_route.get_n_nodes());
+    /// ```
+    pub fn get_n_nodes(&self) -> usize {
+        self.indexes.len()
+    }
 }
 impl<'a> Individual<'a> for Route {
     // The Distance matrix is needed by the individuals to compute their fitness on.
@@ -150,6 +163,11 @@ mod tests {
         fn test_constructor() {
             let route = Route::new(vec![1, 2, 3, 4]);
             assert_eq!(route.indexes, vec![1, 2, 3, 4])
+        }
+        #[test]
+        fn test_n_nodes() {
+            let three_node_route = Route::from(Route::new(vec![0, 1, 2]));
+            assert_eq!(three_node_route.get_n_nodes(), 3);
         }
         #[test]
         fn test_mutuate_no_prob() {
