@@ -78,7 +78,22 @@ impl Routes {
 
         Routes { routes }
     }
-    /// TODO
+    /// Add new routes to a `Routes`-object and create a new `Routes`-object
+    ///
+    /// # Arguments
+    ///
+    /// * `routes` - A vector of `Route`s that should be added.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
+    ///
+    /// let current_routes = Routes::from(vec![Route::new(vec![1]), Route::new(vec![2])]);
+    /// let extended_routes = current_routes.add_vec_route(vec![Route::new(vec![3]), Route::new(vec![4])]);
+    ///
+    /// ```
     pub fn add_vec_route(self, routes: Vec<Route>) -> Self {
         Routes::from(
             self.routes
