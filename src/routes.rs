@@ -1,9 +1,8 @@
 use crate::distance_mat::DistanceMat;
-use genetic_algorithm_traits::{Individual, Population};
-
 use crate::route::Route;
 use crate::utils::random_permutation;
 use crossbeam_utils::thread;
+use genetic_algorithm_traits::{Individual, Population};
 use std::collections::HashSet;
 use std::convert::From;
 use std::fmt;
@@ -99,6 +98,30 @@ impl Routes {
             self.routes
                 .iter()
                 .chain(routes.to_owned().iter())
+                .map(|route| route.clone())
+                .collect::<Vec<Route>>(),
+        )
+    }
+    /// Combine two routes objects.
+    ///
+    /// # Arguments
+    ///
+    /// * `routes` - A vector of `Route`s that should be added.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use genetic_algorithm_tsp::routes::Routes;
+    /// use genetic_algorithm_tsp::route::Route;
+    ///
+    /// let current_routes = Routes::from(vec![Route::new(vec![1]), Route::new(vec![2])]);
+    /// let other_routes = Routes::from(vec![Route::new(vec![3]), Route::new(vec![4])]);
+    /// println!("{}", current_routes.combine_routes(other_routes));
+    /// ```
+    pub fn combine_routes(self, other_routes: Routes) -> Self {
+        self.add_vec_route(
+            other_routes
+                .iter()
                 .map(|route| route.clone())
                 .collect::<Vec<Route>>(),
         )
@@ -354,6 +377,24 @@ mod tests {
                 Route::new(vec![4]),
             ],
             &extended_routes
+                .iter()
+                .map(|route| route.clone())
+                .collect::<Vec<Route>>(),
+        )
+    }
+    #[test]
+    fn test_combine_routes() {
+        let current_routes = Routes::from(vec![Route::new(vec![1]), Route::new(vec![2])]);
+        let other_routes = Routes::from(vec![Route::new(vec![3]), Route::new(vec![4])]);
+        let combined_routes = current_routes.combine_routes(other_routes);
+        valid_permutation(
+            &vec![
+                Route::new(vec![1]),
+                Route::new(vec![2]),
+                Route::new(vec![3]),
+                Route::new(vec![4]),
+            ],
+            &combined_routes
                 .iter()
                 .map(|route| route.clone())
                 .collect::<Vec<Route>>(),
