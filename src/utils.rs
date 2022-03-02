@@ -65,7 +65,7 @@ pub fn remove_elem(mut data: Vec<usize>, elem_idx: usize) -> Vec<usize> {
 /// * `subsequence` - The actual subsequence that is taken.
 ///
 pub fn ordered_crossover(parent_a: &Route, parent_b: &Route, subsequence: Subsequence) -> Route {
-    let mut child: Vec<usize> = Vec::new();
+    let mut child: Vec<usize> = Vec::with_capacity(parent_a.get_n_nodes());
     let mapped_selection = subsequence.get_values_in(&parent_a.indexes).unwrap();
     // First push elements in subsequence of receiver, that are not in subsequence of donor.
     for elem in subsequence.get_values_in(&parent_b.indexes).unwrap() {
