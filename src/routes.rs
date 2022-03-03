@@ -2,18 +2,35 @@ use crate::distance_mat::DistanceMat;
 use crate::route::Route;
 use crate::utils::random_permutation;
 use crossbeam_utils::thread;
+use fasthash::xx;
 use genetic_algorithm_traits::{Individual, Population};
 use std::collections::HashSet;
 use std::convert::From;
 use std::fmt;
 use std::time::Instant;
 
+/// TODO: Docs
+fn route_vec_to_xx_hashset(
+    routes: Vec<Route>,
+    initial_capacity: Option<usize>,
+) -> HashSet<Route, xx::Hash64> {
+    let mut routes_in_hashset = match initial_capacity {
+        None => HashSet::with_hasher(xx::Hash64),
+        Some(initial_capacity) => HashSet::with_capacity_and_hasher(initial_capacity, xx::Hash64),
+    };
+
+    for route in routes {
+        routes_in_hashset.insert(route);
+    }
+    routes_in_hashset
+}
+
 /// The `Population` is your current pools of routes that you would to improve by evolving them.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Routes {
     /// An individual routes is made from `routes`, e.g. individuals that might your given problem
     /// better of worse.
-    routes: HashSet<Route>,
+    routes: HashSet<Route, xx::Hash64>,
 }
 impl fmt::Display for Routes {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -27,6 +44,7 @@ impl fmt::Display for Routes {
         )
     }
 }
+
 // Convert a Vector of solutioons to a routes.
 impl From<Vec<Route>> for Routes {
     /// Create a new Population of Routse from a vector of routes.
@@ -69,7 +87,7 @@ impl Routes {
     /// ```
     pub fn random(n_routes: usize, route_length: usize) -> Self {
         let all_objects = (0..route_length).collect::<Vec<usize>>();
-        let mut routes = HashSet::new();
+        let mut routes = HashSet::with_capacity_and_hasher(1000, xx::Hash64);
 
         while routes.len() < n_routes {
             routes.insert(Route::new(random_permutation(&all_objects)));
@@ -377,16 +395,20 @@ mod tests {
                 }
             ])
             .routes,
-            HashSet::from([
-                Route {
-                    indexes: vec![0, 1, 2]
-                },
-                Route {
-                    indexes: vec![0, 2, 1]
-                }
-            ])
+            route_vec_to_xx_hashset(
+                vec![
+                    Route {
+                        indexes: vec![0, 1, 2]
+                    },
+                    Route {
+                        indexes: vec![0, 2, 1]
+                    }
+                ],
+                None
+            )
         )
     }
+
     #[test]
     fn random_constructor() {
         let n_objects = 3;
@@ -530,7 +552,7 @@ mod tests {
             assert_eq!(
                 routes.get_fittest_population(0, &distance_mat),
                 Routes {
-                    routes: HashSet::new()
+                    routes: HashSet::with_hasher(xx::Hash64)
                 },
             )
         }
@@ -545,7 +567,7 @@ mod tests {
             assert_eq!(
                 routes.get_fittest_population(1, &distance_mat),
                 Routes {
-                    routes: HashSet::from([Route::new(vec![1, 0]),]),
+                    routes: route_vec_to_xx_hashset(vec![Route::new(vec![1, 0]),], None),
                 },
             )
         }
@@ -560,7 +582,10 @@ mod tests {
             assert_eq!(
                 routes.get_fittest_population(2, &distance_mat),
                 Routes {
-                    routes: HashSet::from([Route::new(vec![1, 0]), Route::new(vec![2, 0])]),
+                    routes: route_vec_to_xx_hashset(
+                        vec![Route::new(vec![1, 0]), Route::new(vec![2, 0])],
+                        None
+                    ),
                 },
             )
         }
@@ -575,11 +600,14 @@ mod tests {
             assert_eq!(
                 routes.get_fittest_population(3, &distance_mat),
                 Routes {
-                    routes: HashSet::from([
-                        Route::new(vec![1, 0]),
-                        Route::new(vec![2, 0]),
-                        Route::new(vec![1, 2, 0]),
-                    ]),
+                    routes: route_vec_to_xx_hashset(
+                        vec![
+                            Route::new(vec![1, 0]),
+                            Route::new(vec![2, 0]),
+                            Route::new(vec![1, 2, 0]),
+                        ],
+                        None
+                    ),
                 },
             )
         }
@@ -610,5 +638,10 @@ mod tests {
                 valid_permutation(&vec![0, 1, 2], &route.indexes);
             }
         }
+    }
+    #[test]
+    fn test() {
+        let mut set = HashSet::with_capacity_and_hasher(1000, xx::Hash64);
+        set.insert(Route::new(vec![1, 2, 3]));
     }
 }
