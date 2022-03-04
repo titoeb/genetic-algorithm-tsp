@@ -337,8 +337,7 @@ pub fn evolve_population(
             Routes::from(
                 result
                     .into_iter()
-                    .map(|thread| thread.join().unwrap())
-                    .flatten()
+                    .flat_map(|thread| thread.join().unwrap())
                     .collect::<Vec<Route>>(),
             )
         })
