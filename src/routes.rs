@@ -2,7 +2,7 @@ use crate::distance_mat::DistanceMat;
 use crate::route::Route;
 use crate::utils::random_permutation;
 use crossbeam_utils::thread;
-use fasthash::xx;
+use fasthash_fork::xx;
 use genetic_algorithm_traits::{Individual, Population};
 use std::collections::HashSet;
 use std::convert::From;
