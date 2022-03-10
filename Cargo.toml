@@ -10,7 +10,7 @@ Using genetic algorithms to solve Traveling salesman problems.
 
 [dependencies]
 crossbeam-utils = "0.8.6"
-fasthash = {git = "https://github.com/flier/rust-fasthash"}
+fasthash-fork = "0.4.1" 
 genetic-algorithm-traits = "0.1.0"
 rand = "0.8.4"
 
